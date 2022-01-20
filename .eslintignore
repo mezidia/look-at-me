@@ -1,0 +1,8 @@
+/* eslint-disable */
+pages/
+components/
+layouts/
+dist/
+.nuxt/
+examples/
+node_modules/
