@@ -6,9 +6,6 @@
   color="red"
   width=200px>
     <video width="200px" height="150px" id="video"></video>
-    <v-row class="play-icon-row">
-      <v-icon @click="cameraClick">mdi-video</v-icon>
-    </v-row>
   </v-card>
 </template>
 
@@ -20,20 +17,7 @@ import Component from 'nuxt-class-component'
   components: {}
 })
 
-export default class UserBlock extends Vue {
-  cameraOn = false;
-  cameraClick() {
-    const video = document.getElementById('video');
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then(stream => {
-          video.srcObject = stream;
-          if (!this.cameraOn) video.play();
-          else video.pause();
-          this.cameraOn = !this.cameraOn;
-      })
-      .catch(err => console.log('An error occurred: ' + err));
-  }
-}
+export default class UserBlock extends Vue {}
 </script>
 
 <style>
