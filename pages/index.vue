@@ -19,6 +19,7 @@
       </v-col>
       
     </v-row>
+    <AcquaintanceModal />
   </v-container>
 </template>
 
@@ -26,9 +27,10 @@
 import { Vue } from 'nuxt-property-decorator'
 import Component from 'nuxt-class-component'
 import BasicButton from '../components/BasicButton.vue'
+import AcquaintanceModal from '../components/AcquaintanceModal.vue'
 
 @Component({
-  components: {BasicButton}
+  components: {BasicButton, AcquaintanceModal}
 })
 export default class IndexPage extends Vue {
   onCreateRoomClick() {
