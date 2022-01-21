@@ -6,3 +6,4 @@ dist/
 .nuxt/
 examples/
 node_modules/
+helpers/
