@@ -44,7 +44,9 @@ import Component from 'nuxt-class-component'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
-import { io } from "socket.io-client"
+import { io } from 'socket.io-client'
+import { EVENTS } from '../../helpers/events'
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -61,8 +63,23 @@ export default class RoomPage extends Vue {
   stream = null;
   pageLoading = true;
 
+  socket = null;
+  peers = {};
+  clients = [];
+
+  myMediaStreams = {};
+
   async mounted() {
-    io('http://localhost:8000/')
+    this.socket = io('http://localhost:8000/');
+    this.socket.on(EVENTS.ADD_PEER, (data) => {
+      const { peerId, createOffer } = data;
+
+      console.log(peerId, createOffer);
+    });
+
+    const roomId = uuidv4();
+    this.socket.emit(EVENTS.JOIN, { roomId });
+
 
     const video = document.getElementById('videoYou');
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
