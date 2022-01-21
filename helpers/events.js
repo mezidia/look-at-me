@@ -1,4 +1,4 @@
-export const EVENTS = {
+export default {
   JOIN: 'join',
   ADD_PEER: 'addPeer',
   SHARE_ROOMS_INFO: 'shareRoomsInfo',

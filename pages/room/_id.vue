@@ -45,7 +45,8 @@ import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
 import { io } from 'socket.io-client'
-import { EVENTS } from '../../helpers/events'
+import { inputEvents } from '../../helpers/inputEvents'
+import EVENTS from '../../helpers/events'
 import { v4 as uuidv4 } from 'uuid';
 
 @Component({
@@ -77,9 +78,13 @@ export default class RoomPage extends Vue {
       console.log(peerId, createOffer);
     });
 
-    const roomId = uuidv4();
+    //const roomId = uuidv4();
+    const roomId = 1;
+    for (const eventName in inputEvents) {
+      console.log(this);
+      this.socket.on(eventName, inputEvents[eventName].bind(this));
+    }
     this.socket.emit(EVENTS.JOIN, { roomId });
-
 
     const video = document.getElementById('videoYou');
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
