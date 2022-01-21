@@ -5,15 +5,15 @@
   >
     <v-card>
       <v-card-text>
-        <h3>Introduce yourself гад:</h3>
+        <h3 class="pt-3 headline">Write down your nickname:</h3>
         <input
+          class="mt-3 pa-2"
           type="text"
           name="input"
           placeholder="Type here"
           size="40"
           v-model="inputNickname"
         >
-        {{ nickname }}
       </v-card-text>
       <v-card-actions class="d-flex justify-end">
         <BasicButton
@@ -40,8 +40,9 @@ export default class AcquaintanceModal extends Vue {
   @State nickname
 
   onSubmitClick() {
+    if (!this.inputNickname) return;
     this.setNickname(this.inputNickname);
-    console.log(this.nickname);
+    this.modal = false;
   }
 }
 </script>
