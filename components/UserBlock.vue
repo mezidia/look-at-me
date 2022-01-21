@@ -2,12 +2,15 @@
   <v-card 
   elevation=2 
   class="user-block-holder ma-5"
-  height=150px
+  :height="height + 'px'"
   :img="image"
-  width=200px>
+  :width="width + 'px'">
     <p :style="{'visibility': cameraOn ? 'hidden' : 'visible'}" class="name">{{ name }}</p>
-    <video :style="{'visibility': !cameraOn ? 'hidden' : 'visible'}" width="200px" height="150px" :id="'video' + name"></video>
-    <OnOffIcon class="devices-onoff" iconName="mdi-microphone" :clicked="micClicked"/>
+    <video :style="{'visibility': !cameraOn ? 'hidden' : 'visible'}" autoplay :width="width + 'px'" :height="height + 'px'" :id="'video' + name"></video>
+    <v-row class="user-options">
+      <OnOffIcon iconName="mdi-microphone" :pointer="false" :clicked="micClicked"/>
+      <OnOffIcon v-if="name !== 'You'" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
+    </v-row>
   </v-card>
 </template>
 
@@ -25,6 +28,12 @@ export default class UserBlock extends Vue {
   @Prop({type: Boolean, required: false}) cameraOn;
   @Prop({type: String, required: true}) image;
   @Prop({type: Boolean, required: false}) micClicked;
+  @Prop({type: Number, required: true}) width;
+  @Prop({type: Number, required: true}) height;
+
+  removePersonFromRoom() {
+    // remove him
+  }
 }
 </script>
 
@@ -48,9 +57,10 @@ p {
   text-shadow: 1px 1px 2px black;
 }
 
-.devices-onoff {
+.user-options {
   position: absolute;
-  bottom: 40px;
-  left: 10px;
+  bottom: 20px;
+  left: 20px;
 }
+
 </style>

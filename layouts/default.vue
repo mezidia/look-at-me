@@ -10,7 +10,11 @@
 import { Vue } from 'nuxt-property-decorator'
 import Component from 'nuxt-class-component'
 
-Component({})
+Component({
+  name: 'default'
+})
 
-export default class DefaultLayout extends Vue {}
+export default class DefaultPage extends Vue {
+  
+}
 </script>
