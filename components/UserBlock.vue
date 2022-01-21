@@ -5,7 +5,7 @@
   :height="height + 'px'"
   :img="image"
   :width="width + 'px'">
-    <p :style="{'visibility': cameraOn ? 'hidden' : 'visible'}" class="name">{{ name }}</p>
+    <p :style="{'visibility': cameraOn || pageLoading ? 'hidden' : 'visible'}" class="name">{{ name }}</p>
     <video :style="{'visibility': !cameraOn ? 'hidden' : 'visible'}" autoplay :width="width + 'px'" :height="height + 'px'" :id="'video' + name"></video>
     <v-row class="user-options">
       <OnOffIcon iconName="mdi-microphone" :pointer="false" :clicked="micClicked"/>
@@ -30,6 +30,7 @@ export default class UserBlock extends Vue {
   @Prop({type: Boolean, required: false}) micClicked;
   @Prop({type: Number, required: true}) width;
   @Prop({type: Number, required: true}) height;
+  @Prop({type: Boolean, required: false, default: false}) pageLoading;
 
   removePersonFromRoom() {
     // remove him

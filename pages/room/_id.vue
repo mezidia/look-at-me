@@ -9,11 +9,11 @@
       indeterminate />
     </v-row>
     
-    <div v-else>
+    <div :style="{'visibility': pageLoading ? 'hidden' : 'visible'}">
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock name="You" :cameraOn="showVideo" :image="image" :micClicked="micOn" :width="width" :height="height"/>
-          <UserBlock v-for="(user, index) in users" :key="index" :name="user.name" :image="image" :micClicked="user.mic" :width="width" :height="height"/>
+          <UserBlock name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          <UserBlock v-for="(user, index) in users" :key="index" :name="user.name" :pageLoading="pageLoading" :image="image" :micClicked="user.mic" :width="width" :height="height"/>
         </v-row>
       </v-row>
       <v-row class="play-icon-row">
@@ -112,7 +112,7 @@ export default class RoomPage extends Vue {
   }
 
   copyLink() {
-    window.navigator.clipboard.writeText('Link of the room');
+    window.navigator.clipboard.writeText(window.location.href);
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
