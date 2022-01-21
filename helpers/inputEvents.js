@@ -3,6 +3,7 @@ import EVENTS from './events'
 
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
+    console.log(1)
     console.log('TEST' ,peerId, createOffer);
     if (this.peers.hasOwnProperty(peerId)) {
       return //error
@@ -13,20 +14,22 @@ export const inputEvents = {
         this.socket.emit(EVENTS.ACCEPT_ICE, { peerId, iceCandidate: event.candidate})
       }
     }
+    console.log(2)
     let tracksNumber = 0;
     this.peers[peerId].ontrack = ({ streams: [ remoteStream ] }) => {
-      tracksNumber++
+      tracksNumber++;
+      console.log('peeeeers', this.peers[peerId]);
       if (tracksNumber === 2) {
         tracksNumber = 0
         if (this.clients.includes(peerId)) return // error
         // assign stream
-        this.window.remoteAudio.srcObject = remoteStream // C
-        this.window.remoteAudio.autoplay = true
+        document.getElementById('video1').srcObject = remoteStream // C
+        //this.window.remoteAudio.autoplay = true
         //
       }
     }
-    Object.values(this.myMediaStreams).forEach(track => {
-      this.peers[peerId].addTrack(track, this.myMediaStreams);
+    this.stream.getTracks().forEach(track => {
+      this.peers[peerId].addTrack(track, this.stream);
     })
     if (createOffer) {
       const offer = await this.peers[peerId].createOffer()

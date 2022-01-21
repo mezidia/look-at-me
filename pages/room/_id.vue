@@ -68,10 +68,14 @@ export default class RoomPage extends Vue {
   peers = {};
   clients = [];
 
-  myMediaStreams = {};
-
   async mounted() {
-    this.socket = io('http://localhost:8000/');
+    const video = document.getElementById('videoYou');
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      video.srcObject = stream;
+      this.stream = stream;
+      this.captureMedia();
+      this.socket = io('http://localhost:8000/');
     this.socket.on(EVENTS.ADD_PEER, (data) => {
       const { peerId, createOffer } = data;
 
@@ -84,14 +88,7 @@ export default class RoomPage extends Vue {
       console.log(this);
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
-    this.socket.emit(EVENTS.JOIN, { roomId });
-
-    const video = document.getElementById('videoYou');
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    .then(stream => {
-      video.srcObject = stream;
-      this.stream = stream;
-      this.captureMedia();
+      this.socket.emit(EVENTS.JOIN, { roomId });
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
