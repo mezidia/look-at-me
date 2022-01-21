@@ -1,6 +1,5 @@
 import EVENTS from './events'
 import freeice from 'freeice'
-import { Socket } from 'socket.io-client';
 
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async ({ peerId, createOffer }) => {
@@ -20,7 +19,7 @@ export const inputEvents = {
         tracksNumber = 0;
         if (this.clients.includes(peerId)) return; // error
         // assign stream
-        this.window.remoteAudio.srcObject = remoteStream; // C
+        document.getElementById('video1').srcObject = remoteStream; // C
         this.window.remoteAudio.autoplay = true;
         //
       }
