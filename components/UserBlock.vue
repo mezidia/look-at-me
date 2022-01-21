@@ -6,7 +6,7 @@
   :img="image"
   :width="width + 'px'">
     <p :style="{'visibility': cameraOn || pageLoading ? 'hidden' : 'visible'}" class="name">{{ name }}</p>
-    <video :style="{'visibility': !cameraOn ? 'hidden' : 'visible'}" autoplay :width="width + 'px'" :height="height + 'px'" :id="'video' + name"></video>
+    <video  autoplay :width="width + 'px'" :height="height + 'px'" :id="'video' + name"></video>
     <v-row class="user-options">
       <OnOffIcon iconName="mdi-microphone" :pointer="false" :clicked="micClicked"/>
       <OnOffIcon v-if="name !== 'You'" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
@@ -23,7 +23,7 @@ import OnOffIcon from '../components/OnOffIcon.vue'
   components: {OnOffIcon}
 })
 
-export default class UserBlock extends Vue {
+export default class UserBlock extends Vue { //:style="{'visibility': !cameraOn ? 'hidden' : 'visible'}"
   @Prop({type: String, required: true}) name;
   @Prop({type: Boolean, required: false}) cameraOn;
   @Prop({type: String, required: true}) image;

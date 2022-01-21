@@ -10,6 +10,7 @@
     </v-row>
     
     <div :style="{'visibility': pageLoading ? 'hidden' : 'visible'}">
+      
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
           <UserBlock name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
@@ -69,13 +70,7 @@ export default class RoomPage extends Vue {
   clients = [];
 
   async mounted() {
-    const video = document.getElementById('videoYou');
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    .then(stream => {
-      video.srcObject = stream;
-      this.stream = stream;
-      this.captureMedia();
-      this.socket = io('http://localhost:8000/');
+    this.socket = io('http://localhost:8000/');
     this.socket.on(EVENTS.ADD_PEER, (data) => {
       const { peerId, createOffer } = data;
 
@@ -88,6 +83,14 @@ export default class RoomPage extends Vue {
       console.log(this);
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
+
+    const video = document.getElementById('videoYou');
+    await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    .then(stream => {
+      video.srcObject = stream;
+      this.stream = stream;
+      document.getElementById('videoYou').srcObject = stream;
+      this.captureMedia();
       this.socket.emit(EVENTS.JOIN, { roomId });
     })
     .catch(err => console.log('An error occurred: ' + err));

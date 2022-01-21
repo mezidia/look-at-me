@@ -19,16 +19,20 @@ export const inputEvents = {
     this.peers[peerId].ontrack = ({ streams: [ remoteStream ] }) => {
       tracksNumber++;
       console.log('peeeeers', this.peers[peerId]);
+      console.log(remoteStream, tracksNumber);
       if (tracksNumber === 2) {
         tracksNumber = 0
-        if (this.clients.includes(peerId)) return // error
+        //if (this.clients.includes(peerId)) return // error
         // assign stream
+        console.log(remoteStream.getTracks())
         document.getElementById('video1').srcObject = remoteStream // C
-        //this.window.remoteAudio.autoplay = true
+        //document.getElementById('video1').play()
+        setTimeout(() => console.log(document.getElementById('video1').srcObject), 3000)
         //
       }
     }
     this.stream.getTracks().forEach(track => {
+      console.log(3)
       this.peers[peerId].addTrack(track, this.stream);
     })
     if (createOffer) {
