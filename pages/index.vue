@@ -24,22 +24,33 @@
 </template>
 
 <script>
-import { Vue } from 'nuxt-property-decorator'
+import { Vue, namespace } from 'nuxt-property-decorator'
 import Component from 'nuxt-class-component'
 import BasicButton from '../components/BasicButton.vue'
 import AcquaintanceModal from '../components/AcquaintanceModal.vue'
+
+
+const { Action, State } = namespace('modal');
+const { State: UserState } = namespace('user');
 
 @Component({
   components: {BasicButton, AcquaintanceModal}
 })
 export default class IndexPage extends Vue {
+  @Action setModal
+  @State modal
+
+  @UserState nickname
+
   onCreateRoomClick() {
+    this.setModal(true);
     console.log('createRoom');
   }
 
   onFindRoomClick() {
     console.log('findRoom');
   }
+
 }
 </script>
 
