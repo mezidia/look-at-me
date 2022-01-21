@@ -34,5 +34,39 @@ export const inputEvents = {
       this.socket.emit(EVENTS.ACCEPT_SDP, { peerId, sessionDescription: offer })
     }
     return;
+  },
+  [EVENTS.SESSION_DESCRIPTION]: async function ({ peerId, sessionDescription: remoteDescription }) {
+    await this.peers[peerId]?.setRemoteDescription(
+      new RTCSessionDescription(remoteDescription)
+    );
+
+    if (remoteDescription.type === 'offer') {
+      const answer = await this.peers[peerId].createAnswer();
+
+      await this.peers[peerId].setLocalDescription(answer);
+
+      this.socket.emit(EVENTS.ACCEPT_SDP, {
+        peerId,
+        sessionDescription: answer,
+      });
+    }
+    return;
+  },
+  [EVENTS.ICE_CANDIDATE]: async function ({ peerId, iceCandidate }) {
+    this.peers[peerId]?.addIceCandidate(
+      new RTCIceCandidate(iceCandidate)
+    );
+    return;
+  },
+  [EVENTS.REMOVE_PEER]: async function ({ peerId }) {
+    if (this.peers[peerId]) {
+      this.peers[peerId].close();
+    }
+
+    delete this.peers[peerId];
+    delete this.peers[peerId];
+
+    // updateClients(list => list.filter(c => c !== peerId)); //update clients!
+    return;
   }
 }
