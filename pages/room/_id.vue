@@ -70,12 +70,7 @@ export default class RoomPage extends Vue {
   clients = [];
 
   async mounted() {
-    this.socket = io('http://localhost:8000/');
-    this.socket.on(EVENTS.ADD_PEER, (data) => {
-      const { peerId, createOffer } = data;
-
-      console.log(peerId, createOffer);
-    });
+    this.socket = io('https://look-at-me-ws.herokuapp.com/');
 
     //const roomId = uuidv4();
     const roomId = 1;
