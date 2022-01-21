@@ -2,6 +2,8 @@
   <v-dialog
     width="400"
     v-model="modal"
+    @click:outside="setModal(false)"
+    @keydown.esc="setModal(false)"
   >
     <v-card>
       <v-card-text>
@@ -26,23 +28,30 @@
 </template>
 
 <script>
-import { Component, Vue, namespace } from 'nuxt-property-decorator'
+import { Component, Vue, namespace, Prop } from 'nuxt-property-decorator'
 import { BasicButton } from './BasicButton.vue'
+import { v4 as uuidv4 } from 'uuid'
 
 const { State, Action } = namespace('user')
+const { State: ModalState, Action: ModalAction } = namespace('modal');
 
 @Component({BasicButton})
 export default class AcquaintanceModal extends Vue {
-  modal = true;
   inputNickname = null;
 
   @Action setNickname
   @State nickname
 
+  @ModalState modal
+  @ModalAction setModal
+
   onSubmitClick() {
+    const roomId = uuidv4();
     if (!this.inputNickname) return;
+    console.log(this.nickname);
     this.setNickname(this.inputNickname);
-    this.modal = false;
+    this.setModal(false);
+    window.location.replace('http://localhost:3000/room/' + roomId);
   }
 }
 </script>
