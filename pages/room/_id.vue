@@ -44,6 +44,7 @@ import Component from 'nuxt-class-component'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
+import { io } from "socket.io-client"
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -61,6 +62,8 @@ export default class RoomPage extends Vue {
   pageLoading = true;
 
   async mounted() {
+    io('http://localhost:8000/')
+
     const video = document.getElementById('videoYou');
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
