@@ -13,7 +13,6 @@
           type="text"
           name="input"
           placeholder="Type here"
-          size="40"
           v-model="inputNickname"
         >
       </v-card-text>
@@ -57,4 +56,8 @@ export default class AcquaintanceModal extends Vue {
 </script>
 
 <style>
+  input:focus, input {
+    color: whitesmoke;
+    font-size: 20px;
+  }
 </style>
