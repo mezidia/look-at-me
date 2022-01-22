@@ -8,6 +8,7 @@ export const state = () => ({
 export const mutations = {
   addUser (state, peerId, stream) {
     Vue.set(state.users, peerId, { peerId, stream, name: peerId, cameraOn: true, micOn: true })
+    // stream.getVideoTracks()[0].onmute = () => console.log('kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
   },
   setRoomId (state, roomId) {
     state.roomId = roomId

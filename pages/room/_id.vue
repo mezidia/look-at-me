@@ -1,6 +1,5 @@
 <template>
   <div id="room-holder">
-    <h1>{{ socket.id }}</h1>
     <v-row
     v-if="pageLoading"
     justify="center">
@@ -14,7 +13,7 @@
       
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock :id="socket.id" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          <UserBlock :id="peerId" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
           <UserBlock :id="user.peerId" v-for="user in users" :key="user.peerId" :name="user.name" :pageLoading="pageLoading" :image="image" :cameraOn="user.cameraOn" :micClicked="user.micOn" :width="width" :height="height"/>
         </v-row>
       </v-row>
@@ -49,6 +48,7 @@ import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
 import events from '../../helpers/events'
+import { connect } from 'socket.io-client'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -83,32 +83,27 @@ export default class RoomPage extends Vue {
   rooms = [];
   peerId = '1';
 
-  async created() {
-    this.roomId = this.$route.path.split('/')[2]
-    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
-    this.socket = socketIo();
-    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
-    await new Promise(resolve => this.socket.on('connect', resolve))
-  }
-
   beforeCreate() {
+    console.log('before create')
     this.roomId = this.$route.path.split('/')[2];
   }
 
   async mounted() {
-    console.log(this.isNewRoom);
-    this.setModal(true);
+    this.roomId = this.$route.path.split('/')[2]
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
+    console.log('mounted')
     this.socket = socketIo();
+    this.setModal(true);
+    
     
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
 
-    const video = document.getElementById('video' + this.socket.id);
+    const video = document.getElementById('video1');
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
-      video.srcObject = stream;
       this.stream = stream;
       video.srcObject = stream;
       this.captureMedia();
@@ -117,11 +112,6 @@ export default class RoomPage extends Vue {
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
   }
-
-  // beforeUnmount() {
-  //   console.log('unmount');
-  //   this.closeSockets()
-  // }
 
   cameraClick() {
     this.cameraOn = !this.cameraOn;
@@ -151,13 +141,13 @@ export default class RoomPage extends Vue {
 
   closeSockets() {
     this.stream.getTracks().forEach(track => track.stop());
-    this.socket.emit(events.LEAVE, { roomId: this.roomId });
-    this.socket.close();
+    // this.socket.emit(events.LEAVE, { roomId: this.roomId });
+    this.socket.disconnect();
   }
 
   leaveRoom() {
     this.closeSockets();
-    //window.location.replace('http://localhost:3000/');
+    window.location.replace('http://localhost:3000/');
   }
 }
 </script>
