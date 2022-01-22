@@ -83,22 +83,15 @@ export default class RoomPage extends Vue {
   rooms = [];
   peerId = '1';
 
-<<<<<<< HEAD
   async created() {
     this.roomId = this.$route.path.split('/')[2]
     this.socket = socketIo();
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     await new Promise(resolve => this.socket.on('connect', resolve))
   }
 
-  async mounted() {    
-    console.log(this.socket, this.socket.connected)
-=======
   beforeCreate() {
     this.roomId = this.$route.path.split('/')[2];
-  }
-
-  created() {
-    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
   }
 
   async mounted() {
@@ -106,7 +99,6 @@ export default class RoomPage extends Vue {
     this.setModal(true);
     this.socket = socketIo();
     
->>>>>>> ffd44b09c120f9231dd7bd4b7adac017cbfa09c5
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
