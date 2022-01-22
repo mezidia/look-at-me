@@ -22,6 +22,7 @@ export const inputEvents = {
     this.peers[peerId].ontrack = ({ streams: [ remoteStream ] }) => {                 ////ontrack
       tracksNumber++;
       this.addUser(peerId, remoteStream);
+      console.log(remoteStream.getVideoTracks()[0])
       const peerVideo = document.getElementById('video' + peerId);
       if (tracksNumber === 2) {
         tracksNumber = 0
@@ -93,12 +94,12 @@ export const inputEvents = {
   [EVENTS.REMOVE_PEER]: async function ({ peerId }) {
     console.log('leave', peerId)
     this.deleteUser(peerId);
+    console.log(this.users)
 
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
     
-    delete this.peers[peerId];
     delete this.peers[peerId];
     return;
   },
