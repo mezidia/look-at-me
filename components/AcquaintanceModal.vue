@@ -34,6 +34,7 @@ import { v4 as uuidv4 } from 'uuid'
 const { State, Action } = namespace('user')
 const { State: ModalState, Action: ModalAction } = namespace('modal');
 const { Action: RoomAction } = namespace('room');
+const { Mutation: SubmitClickMutation, State: SubmitClickState } = namespace('submitClick');
 
 @Component({BasicButton})
 export default class AcquaintanceModal extends Vue {
@@ -47,6 +48,12 @@ export default class AcquaintanceModal extends Vue {
 
   @RoomAction setRoomId
 
+  @SubmitClickMutation updateClicked
+  @SubmitClickMutation updateGeneratedRoomId
+
+  @SubmitClickState clicked
+  @SubmitClickState generatedRoomId
+
   onSubmitClick() {
     const roomId = uuidv4();
     if (!this.inputNickname) return;
@@ -54,7 +61,13 @@ export default class AcquaintanceModal extends Vue {
     this.setNickname(this.inputNickname);
     this.setModal(false);
     this.setRoomId(roomId);
-    window.location.replace('http://localhost:3000/room/' + roomId);
+    this.updateClicked(true);
+    this.updateGeneratedRoomId(roomId);
+    this.$router.replace({ path: '/room/' + roomId });
+  }
+
+  mounted() {
+    this.updateClicked(false);
   }
 }
 </script>

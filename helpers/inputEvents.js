@@ -1,8 +1,6 @@
 import freeice from 'freeice'
 import EVENTS from './events'
 
-
-
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
     if (this.peers.hasOwnProperty(peerId)) {

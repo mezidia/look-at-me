@@ -50,6 +50,7 @@ import EVENTS from '../../helpers/events'
 import { v4 as uuidv4 } from 'uuid'
 
 const { State, Mutation } = namespace('room')
+const { Mutation: SubmitClickMutation, State: SubmitClickState } = namespace('submitClick')
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -58,6 +59,9 @@ const { State, Mutation } = namespace('room')
 export default class RoomPage extends Vue {
   @State users;
   @Mutation addUser;
+
+  @SubmitClickState clicked
+  @SubmitClickState generatedRoomId
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -74,15 +78,20 @@ export default class RoomPage extends Vue {
   rooms = [];
 
   beforeCreate() {
-    this.roomId = this.$route.path.split('/')[2]
+    this.roomId = this.$route.path.split('/')[2];
+  }
 
+  created() {
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
   }
 
   async mounted() {
+    console.log('IS NEW ROOM:');
+    console.log(this.isNewRoom);
     this.socket = io('http://localhost:8000');
     window.onbeforeunload = () => {
-      this.socket.close()
-      return true
+      this.socket.close();
+      return true;
     };
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
@@ -96,7 +105,7 @@ export default class RoomPage extends Vue {
       this.stream = stream;
       video.srcObject = stream;
       this.captureMedia();
-      this.socket.emit(EVENTS.JOIN, { roomId });
+      this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
