@@ -53,19 +53,20 @@ export const inputEvents = {
       const offer = await this.peers[peerId].createOffer()
       console.log('setLocal offer');
       await this.peers[peerId].setLocalDescription(offer)
-      this.socket.emit(EVENTS.ACCEPT_SDP, { peerId, to: peerId, sessionDescription: offer })
+      this.socket.emit(EVENTS.ACCEPT_SDP, { peerId, from: this.socket.id, sessionDescription: offer })
     }
     return;
   },
-  [EVENTS.SESSION_DESCRIPTION]: async function ({ peerId, sessionDescription: remoteDescription }) {
+  [EVENTS.SESSION_DESCRIPTION]: async function ({ peerId, from, sessionDescription: remoteDescription }) {
     console.log('got desc', remoteDescription);
     console.log('recived setRemote', remoteDescription.type);
     console.log({
       peers: this.peers,
       to: peerId,
+      from,
       me: this.socket.id
     });
-    await Object.values(this.peers)[0]?.setRemoteDescription(
+    await this.peers[from]?.setRemoteDescription(
       new RTCSessionDescription(remoteDescription)
     ).then(() => {
       console.log('setRemoteDescription done');
@@ -74,9 +75,10 @@ export const inputEvents = {
       const answer = await this.peers[peerId].createAnswer();
       console.log('setLocal answer');
       await this.peers[peerId].setLocalDescription(answer);
-      console.log('createAnswer for ', peerId);
+      console.log('createAnswer for ', peerId, this.socket.id);
       this.socket.emit(EVENTS.ACCEPT_SDP, {
         peerId,
+        from: this.socket.id,
         sessionDescription: answer,
       });
     }
