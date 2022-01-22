@@ -47,8 +47,6 @@ import BasicButton from '../../components/BasicButton.vue'
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
-import events from '../../helpers/events'
-import { connect } from 'socket.io-client'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -94,8 +92,6 @@ export default class RoomPage extends Vue {
     console.log('mounted')
     this.socket = socketIo();
     this.setModal(true);
-    
-    
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));

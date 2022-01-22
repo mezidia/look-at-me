@@ -11,6 +11,6 @@ const options = {
   transports : ["websocket"]
 }
 
-const socketIo = io(serverUrl, options);
+// const socketIo = io(serverUrl, options);
 
-export default () => socketIo;
+export default () => io(serverUrl, options);

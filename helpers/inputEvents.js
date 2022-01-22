@@ -78,5 +78,8 @@ export const inputEvents = {
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
     this.rooms = rooms
+  },
+  [EVENTS.ERROR]: async function ({ msg }) {
+    console.log(msg);
   }
 }
