@@ -2,9 +2,8 @@
   <v-dialog
     width="400"
     v-model="modal"
-    @click:outside="setModal(false)"
-    @keydown.esc="setModal(false)"
     @keydown.enter="onSubmitClick"
+    persistent
   >
     <v-card>
       <v-card-text>
