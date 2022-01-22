@@ -19,7 +19,6 @@
       </v-col>
       
     </v-row>
-    <AcquaintanceModal />
   </v-container>
 </template>
 
@@ -28,10 +27,13 @@ import { Vue, namespace } from 'nuxt-property-decorator'
 import Component from 'nuxt-class-component'
 import BasicButton from '../components/BasicButton.vue'
 import AcquaintanceModal from '../components/AcquaintanceModal.vue'
+import { v4 as uuidv4 } from 'uuid'
 
 
 const { Action, State } = namespace('modal');
 const { State: UserState } = namespace('user');
+const { Mutation: AddRoomMutation, State: AddRoomClickState } = namespace('addRoomClick');
+const { Action: RoomAction } = namespace('room');
 
 @Component({
   components: {BasicButton, AcquaintanceModal}
@@ -42,15 +44,27 @@ export default class IndexPage extends Vue {
 
   @UserState nickname
 
+  @AddRoomMutation updateClicked
+  @AddRoomMutation updateGeneratedRoomId
+
+  @RoomAction setRoomId
+
+  mounted() {
+    this.updateClicked(false);
+  }
+
   onCreateRoomClick() {
-    this.setModal(true);
     console.log('createRoom');
+    const roomId = uuidv4();
+    this.setRoomId(roomId);
+    this.updateClicked(true);
+    this.updateGeneratedRoomId(roomId);
+    this.$router.replace({ path: '/room/' + roomId });
   }
 
   onFindRoomClick() {
     console.log('findRoom');
   }
-
 }
 </script>
 

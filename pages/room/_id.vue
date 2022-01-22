@@ -35,7 +35,7 @@
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
-    
+    <AcquaintanceModal />
   </div>
 </template>
 
@@ -49,7 +49,8 @@ import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
 
 const { State, Mutation } = namespace('room')
-const { Mutation: SubmitClickMutation, State: SubmitClickState } = namespace('submitClick')
+const { State: AddRoomState } = namespace('addRoomClick')
+const { Action: ModalAction } = namespace('modal');
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -60,8 +61,10 @@ export default class RoomPage extends Vue {
   @Mutation addUser;
   @Mutation deleteUser;
 
-  @SubmitClickState clicked
-  @SubmitClickState generatedRoomId
+  @AddRoomState clicked
+  @AddRoomState generatedRoomId
+
+  @ModalAction setModal
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -86,6 +89,8 @@ export default class RoomPage extends Vue {
   }
 
   async mounted() {
+    console.log(this.isNewRoom);
+    this.setModal(true);
     this.socket = socketIo();
     
     const roomId = this.roomId;

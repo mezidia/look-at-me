@@ -29,12 +29,10 @@
 <script>
 import { Component, Vue, namespace, Prop } from 'nuxt-property-decorator'
 import { BasicButton } from './BasicButton.vue'
-import { v4 as uuidv4 } from 'uuid'
 
 const { State, Action } = namespace('user')
 const { State: ModalState, Action: ModalAction } = namespace('modal');
-const { Action: RoomAction } = namespace('room');
-const { Mutation: SubmitClickMutation, State: SubmitClickState } = namespace('submitClick');
+
 
 @Component({BasicButton})
 export default class AcquaintanceModal extends Vue {
@@ -46,28 +44,11 @@ export default class AcquaintanceModal extends Vue {
   @ModalState modal
   @ModalAction setModal
 
-  @RoomAction setRoomId
-
-  @SubmitClickMutation updateClicked
-  @SubmitClickMutation updateGeneratedRoomId
-
-  @SubmitClickState clicked
-  @SubmitClickState generatedRoomId
-
   onSubmitClick() {
-    const roomId = uuidv4();
     if (!this.inputNickname) return;
     console.log(this.nickname);
     this.setNickname(this.inputNickname);
     this.setModal(false);
-    this.setRoomId(roomId);
-    this.updateClicked(true);
-    this.updateGeneratedRoomId(roomId);
-    this.$router.replace({ path: '/room/' + roomId });
-  }
-
-  mounted() {
-    this.updateClicked(false);
   }
 }
 </script>
