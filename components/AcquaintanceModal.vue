@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     width="400"
-    v-model="modal"
+    v-model="nicknameModal"
     @keydown.enter="onSubmitClick"
     persistent
   >
@@ -39,7 +39,7 @@ import { Component, Vue, namespace } from 'nuxt-property-decorator'
 import BasicButton from './BasicButton.vue'
 
 const { State, Action } = namespace('user')
-const { State: ModalState, Action: ModalAction } = namespace('modal');
+const { Mutation: NicknameModalMutation, State: NicknameModalState } = namespace('nicknameModal');
 
 
 @Component({BasicButton})
@@ -50,8 +50,8 @@ export default class AcquaintanceModal extends Vue {
   @Action setNickname
   @State nickname
 
-  @ModalState modal
-  @ModalAction setModal
+  @NicknameModalState nicknameModal
+  @NicknameModalMutation updateNicknameModal
 
   onSubmitClick() {
     if (!this.inputNickname) {
@@ -60,7 +60,7 @@ export default class AcquaintanceModal extends Vue {
     }
     console.log(this.nickname);
     this.setNickname(this.inputNickname);
-    this.setModal(false);
+    this.updateNicknameModal(false);
   }
 
   mounted() {
