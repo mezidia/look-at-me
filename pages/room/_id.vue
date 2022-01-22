@@ -35,7 +35,28 @@
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
-    <AcquaintanceModal />
+    <SettingsModal
+      @nicknameUpdated="onNicknameUpdated(); setNotification();"
+    />
+    <AcquaintanceModal
+      @userCreated="onNicknameUpdated"
+    />
+    <div
+      class="settings-wrapper"
+      @click="updateSettingsModal(true)"
+    >
+      <VuetifyIcon
+        iconName="mdi-cog"
+        class="settings-button"
+      />
+    </div>
+    {{ nickname }}
+    <NotificationSnackbar
+      :text="snackbarText"
+      :snackbar="snackbar"
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+    />
   </div>
 </template>
 
@@ -44,6 +65,10 @@ import { Vue, namespace, Component } from 'nuxt-property-decorator'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
+import VuetifyIcon from '../../components/VuetifyIcon.vue'
+import SettingsModal from '../../components/SettingsModal.vue'
+import NotificationSnackbar from '../../components/NotificationSnackbar.vue'
+
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
@@ -51,9 +76,18 @@ import socketIo from '../../helpers/socketIo.js'
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
 const { Mutation: NicknameModalMutation } = namespace('nicknameModal')
+const { Mutation: SettingsModalMutation } = namespace('settingsModal')
+const { Mutation: UserMutation, State: UserState } = namespace('user')
 
 @Component({
-  components: {UserBlock, OnOffIcon, BasicButton}
+  components: {
+    UserBlock,
+    OnOffIcon,
+    BasicButton,
+    VuetifyIcon,
+    SettingsModal,
+    NotificationSnackbar
+  }
 })
 
 export default class RoomPage extends Vue {
@@ -68,7 +102,12 @@ export default class RoomPage extends Vue {
   @AddRoomState clicked
   @AddRoomState generatedRoomId
 
+  @UserMutation updateNickname
+  @UserState nickname
+
   @NicknameModalMutation updateNicknameModal
+
+  @SettingsModalMutation updateSettingsModal
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -78,6 +117,11 @@ export default class RoomPage extends Vue {
   height = 150;
   stream = null;
   pageLoading = true;
+
+  snackbar = false;
+  snackbarTimeout = 3000;
+  snackbarColor = '#40826d';
+  snackbarText = 'Your nickname has been updated';
 
   socket = null;
   peers = {};
@@ -153,6 +197,15 @@ export default class RoomPage extends Vue {
     this.socket.disconnect();
     window.location.replace('http://localhost:3000/');
   }
+
+  onNicknameUpdated() {
+    this.updateNickname(window.localStorage.getItem('myNickname'));
+  }
+
+  setNotification() {
+    this.snackbar = true;
+    setTimeout(() => this.snackbar = false, this.snackbarTimeout);
+  }
 }
 </script>
 
@@ -179,5 +232,11 @@ div#room-holder {
 
 .v-icon.v-icon::after {
   height: 0%;
+}
+
+.settings-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 </style>
