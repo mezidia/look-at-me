@@ -87,15 +87,22 @@ export default class RoomPage extends Vue {
     this.roomId = this.$route.path.split('/')[2]
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     await new Promise(resolve => this.socket.on('connect', resolve))
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5dab8d0cefaf709665a9eea3b6379b96af82f297
   beforeCreate() {
     this.roomId = this.$route.path.split('/')[2];
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5dab8d0cefaf709665a9eea3b6379b96af82f297
   async mounted() {
     console.log(this.isNewRoom);
     this.setModal(true);
