@@ -28,7 +28,7 @@
 
 <script>
 import { Component, Vue, namespace, Prop } from 'nuxt-property-decorator'
-import { BasicButton } from './BasicButton.vue'
+import BasicButton from './BasicButton.vue'
 import { v4 as uuidv4 } from 'uuid'
 
 const { State, Action } = namespace('user')
