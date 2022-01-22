@@ -36,10 +36,10 @@
       </v-row>
     </div>
     <SettingsModal
-      @nicknameUpdated="onNicknameUpdated"
+      @nicknameUpdated="onNicknameUpdated(); setNotification()"
     />
     <AcquaintanceModal
-      @nicknameUpdated="onNicknameUpdated"
+      @userCreated="onNicknameUpdated"
     />
     <div
       class="settings-wrapper"
@@ -51,6 +51,12 @@
       />
     </div>
     {{ nickname }}
+    <NotificationSnackbar
+      :text="snackbarText"
+      :snackbar="snackbar"
+      :timeout="snackbarTimeout"
+      :color="snackbarColor"
+    />
   </div>
 </template>
 
@@ -61,6 +67,7 @@ import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
 import VuetifyIcon from '../../components/VuetifyIcon.vue'
 import SettingsModal from '../../components/SettingsModal.vue'
+import NotificationSnackbar from '../../components/NotificationSnackbar.vue'
 
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
@@ -73,7 +80,14 @@ const { Mutation: SettingsModalMutation } = namespace('settingsModal')
 const { Mutation: UserMutation, State: UserState } = namespace('user')
 
 @Component({
-  components: {UserBlock, OnOffIcon, BasicButton, VuetifyIcon, SettingsModal}
+  components: {
+    UserBlock,
+    OnOffIcon,
+    BasicButton,
+    VuetifyIcon,
+    SettingsModal,
+    NotificationSnackbar
+  }
 })
 
 export default class RoomPage extends Vue {
@@ -100,6 +114,11 @@ export default class RoomPage extends Vue {
   height = 150;
   stream = null;
   pageLoading = true;
+
+  snackbar = false;
+  snackbarTimeout = 3000;
+  snackbarColor = '#40826d';
+  snackbarText = 'Your nickname has been updated';
 
   socket = null;
   peers = {};
@@ -174,6 +193,11 @@ export default class RoomPage extends Vue {
 
   onNicknameUpdated() {
     this.updateNickname(window.localStorage.getItem('myNickname'));
+  }
+
+  setNotification() {
+    this.snackbar = true;
+    setTimeout(() => this.snackbar = false, this.snackbarTimeout);
   }
 }
 </script>

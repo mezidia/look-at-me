@@ -59,7 +59,7 @@ export default class AcquaintanceModal extends Vue {
     }
     console.log(this.nickname);
     window.localStorage.setItem('myNickname', this.inputNickname);
-    this.$emit('nicknameUpdated');
+    this.$emit('userCreated');
     this.updateNicknameModal(false);
     console.log('Nick from storage:', window.localStorage.getItem('myNickname'));
   }
