@@ -44,10 +44,9 @@ import { Vue, namespace, Component } from 'nuxt-property-decorator'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
-import { io } from 'socket.io-client'
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
-import { v4 as uuidv4 } from 'uuid'
+import socketIo from '../../helpers/socketIo.js'
 
 const { State, Mutation } = namespace('room')
 
@@ -80,11 +79,8 @@ export default class RoomPage extends Vue {
   }
 
   async mounted() {
-    this.socket = io('http://localhost:8000');
-    window.onbeforeunload = () => {
-      this.socket.close()
-      return true
-    };
+    this.socket = socketIo();
+    
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
@@ -130,10 +126,7 @@ export default class RoomPage extends Vue {
   }
 
   leaveRoom() {
-    const audioTracks = this.stream.getAudioTracks();
-    const videoTracks = this.stream.getVideoTracks();
-    audioTracks.forEach(track => track.stop());
-    videoTracks.forEach(track => track.stop());
+    this.stream.getTracks().forEach(track => track.stop());
     // leave room
   }
 }
