@@ -4,6 +4,7 @@
     v-model="modal"
     @click:outside="setModal(false)"
     @keydown.esc="setModal(false)"
+    @keydown.enter="onSubmitClick"
   >
     <v-card>
       <v-card-text>
