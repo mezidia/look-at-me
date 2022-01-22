@@ -36,7 +36,7 @@
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
-    
+    <AcquaintanceModal />
   </div>
 </template>
 
@@ -51,6 +51,8 @@ import socketIo from '../../helpers/socketIo.js'
 import events from '../../helpers/events'
 
 const { State, Mutation } = namespace('room')
+const { State: AddRoomState } = namespace('addRoomClick')
+const { Action: ModalAction } = namespace('modal');
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -60,6 +62,11 @@ export default class RoomPage extends Vue {
   @State users;
   @Mutation addUser;
   @Mutation deleteUser;
+
+  @AddRoomState clicked
+  @AddRoomState generatedRoomId
+
+  @ModalAction setModal
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -76,6 +83,7 @@ export default class RoomPage extends Vue {
   rooms = [];
   peerId = '1';
 
+<<<<<<< HEAD
   async created() {
     this.roomId = this.$route.path.split('/')[2]
     this.socket = socketIo();
@@ -84,6 +92,21 @@ export default class RoomPage extends Vue {
 
   async mounted() {    
     console.log(this.socket, this.socket.connected)
+=======
+  beforeCreate() {
+    this.roomId = this.$route.path.split('/')[2];
+  }
+
+  created() {
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
+  }
+
+  async mounted() {
+    console.log(this.isNewRoom);
+    this.setModal(true);
+    this.socket = socketIo();
+    
+>>>>>>> ffd44b09c120f9231dd7bd4b7adac017cbfa09c5
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
@@ -96,7 +119,7 @@ export default class RoomPage extends Vue {
       this.stream = stream;
       video.srcObject = stream;
       this.captureMedia();
-      this.socket.emit(EVENTS.JOIN, { roomId });
+      this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
