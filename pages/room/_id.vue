@@ -13,8 +13,8 @@
       
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
-          <UserBlock v-for="(user, index) in users" :key="index" :name="user.name" :pageLoading="pageLoading" :image="image" :micClicked="user.mic" :width="width" :height="height"/>
+          <UserBlock :id="'1'" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          <UserBlock :id="user.peerId" v-for="user in users" :key="user.peerId" :name="user.name" :pageLoading="pageLoading" :image="image" :cameraOn="user.cameraOn" :micClicked="user.micOn" :width="width" :height="height"/>
         </v-row>
       </v-row>
       <v-row class="play-icon-row">
@@ -40,23 +40,26 @@
 </template>
 
 <script>
-import { Vue } from 'nuxt-property-decorator'
-import Component from 'nuxt-class-component'
+import { Vue, namespace, Component } from 'nuxt-property-decorator'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
 import { io } from 'socket.io-client'
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'
+
+const { State, Mutation } = namespace('room')
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
 })
 
 export default class RoomPage extends Vue {
+  @State users;
+  @Mutation addUser;
+
   image="https://picsum.photos/200/150?blur";
-  users = [{name: '1', mic: false}, {name: '2', mic: true}]; //, {name: '3', mic: false}, {name: '4', mic: true}, {name: '5', mic: false}, {name:'6', mic: true}, {name: '7', mic: false}]
   cameraOn = false;
   showVideo = false;
   micOn = false;
@@ -70,19 +73,23 @@ export default class RoomPage extends Vue {
   clients = [];
   rooms = [];
 
+  beforeCreate() {
+    this.roomId = this.$route.path.split('/')[2]
+
+  }
+
   async mounted() {
     this.socket = io('http://localhost:8000');
-    window.onbeforeunload = function(){
+    window.onbeforeunload = () => {
       this.socket.close()
       return true
     };
-    //const roomId = uuidv4();
-    const roomId = 1;
+    const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
 
-    const video = document.getElementById('videoYou');
+    const video = document.getElementById('video1');
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
       video.srcObject = stream;
@@ -93,6 +100,10 @@ export default class RoomPage extends Vue {
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
+  }
+
+  newUser(peerId, stream) { //add camera on, mic on, name
+    this.addUser(peerId, stream);
   }
 
   cameraClick() {
