@@ -9,6 +9,17 @@ export const inputEvents = {
     }
 
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
+    this.peers[peerId].ondatachannel = e => {
+      e.channel.onopen = () => {};
+      e.channel.onmessage = e => {
+        const data = JSON.parse(e.data);
+        this.updateDevicesStatus({ peerId, devices: data });
+      };
+    } 
+    const dc = this.peers[peerId].createDataChannel('devicesStatus');
+    this.dcs.push(dc);
+    dc.onopen = () => dc.send(JSON.stringify({cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0].enabled}));
+    dc.onmessage = e => console.log('Message: ', e.data);
     this.peers[peerId].onicecandidate = (event) => {
       if (event.candidate) {
         this.socket.emit(EVENTS.ACCEPT_ICE, { peerId, iceCandidate: event.candidate})
@@ -77,7 +88,7 @@ export const inputEvents = {
     delete this.peers[peerId];
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
-    this.rooms = rooms
+    this.socket.rooms = rooms
   },
   [EVENTS.ERROR]: async function ({ msg }) {
     console.log(msg);
