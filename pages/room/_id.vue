@@ -50,7 +50,7 @@ import socketIo from '../../helpers/socketIo.js'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
-const { Action: ModalAction } = namespace('modal');
+const { Mutation: NicknameModalMutation } = namespace('nicknameModal')
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton}
@@ -65,7 +65,7 @@ export default class RoomPage extends Vue {
   @AddRoomState clicked
   @AddRoomState generatedRoomId
 
-  @ModalAction setModal
+  @NicknameModalMutation updateNicknameModal
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -93,7 +93,7 @@ export default class RoomPage extends Vue {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     console.log('mounted')
     this.socket = socketIo();
-    this.setModal(true);
+    this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
