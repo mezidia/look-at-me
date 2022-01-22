@@ -139,14 +139,9 @@ export default class RoomPage extends Vue {
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
   }
 
-  closeSockets() {
-    this.stream.getTracks().forEach(track => track.stop());
-    // this.socket.emit(events.LEAVE, { roomId: this.roomId });
-    this.socket.disconnect();
-  }
-
   leaveRoom() {
-    this.closeSockets();
+    this.stream.getTracks().forEach(track => track.stop());
+    this.socket.disconnect();
     window.location.replace('http://localhost:3000/');
   }
 }
