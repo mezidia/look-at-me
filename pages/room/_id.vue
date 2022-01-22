@@ -68,14 +68,17 @@ export default class RoomPage extends Vue {
   socket = null;
   peers = {};
   clients = [];
+  rooms = [];
 
   async mounted() {
-    this.socket = io('https://look-at-me-ws.herokuapp.com/');
-
+    this.socket = io('http://localhost:8000');
+    window.onbeforeunload = function(){
+      this.socket.close()
+      return true
+    };
     //const roomId = uuidv4();
     const roomId = 1;
     for (const eventName in inputEvents) {
-      console.log(this);
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
 
@@ -84,7 +87,7 @@ export default class RoomPage extends Vue {
     .then(stream => {
       video.srcObject = stream;
       this.stream = stream;
-      document.getElementById('videoYou').srcObject = stream;
+      video.srcObject = stream;
       this.captureMedia();
       this.socket.emit(EVENTS.JOIN, { roomId });
     })
