@@ -35,8 +35,12 @@
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
-    <SettingsModal />
-    <AcquaintanceModal />
+    <SettingsModal
+      @nicknameUpdated="onNicknameUpdated"
+    />
+    <AcquaintanceModal
+      @nicknameUpdated="onNicknameUpdated"
+    />
     <div
       class="settings-wrapper"
       @click="updateSettingsModal(true)"
@@ -46,6 +50,7 @@
         class="settings-button"
       />
     </div>
+    {{ nickname }}
   </div>
 </template>
 
@@ -65,6 +70,7 @@ const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
 const { Mutation: NicknameModalMutation } = namespace('nicknameModal')
 const { Mutation: SettingsModalMutation } = namespace('settingsModal')
+const { Mutation: UserMutation, State: UserState } = namespace('user')
 
 @Component({
   components: {UserBlock, OnOffIcon, BasicButton, VuetifyIcon, SettingsModal}
@@ -78,6 +84,9 @@ export default class RoomPage extends Vue {
 
   @AddRoomState clicked
   @AddRoomState generatedRoomId
+
+  @UserMutation updateNickname
+  @UserState nickname
 
   @NicknameModalMutation updateNicknameModal
 
@@ -161,6 +170,10 @@ export default class RoomPage extends Vue {
     this.stream.getTracks().forEach(track => track.stop());
     this.socket.disconnect();
     window.location.replace('http://localhost:3000/');
+  }
+
+  onNicknameUpdated() {
+    this.updateNickname(window.localStorage.getItem('myNickname'));
   }
 }
 </script>
