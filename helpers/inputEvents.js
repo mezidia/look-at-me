@@ -1,19 +1,25 @@
 import freeice from 'freeice'
 import EVENTS from './events'
 
+
+
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
     if (this.peers.hasOwnProperty(peerId)) {
       console.log('peer already exist'); 
       return;
     }
-    console.log('add peer');
+
+    console.log('add peer', peerId);
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
     this.peers[peerId].onicecandidate = (event) => {
       if (event.candidate) {
         this.socket.emit(EVENTS.ACCEPT_ICE, { peerId, iceCandidate: event.candidate})
       }
     }
+    this.peers[peerId].onsignalingstatechange = ev => {
+      console.log(this.peers[peerId].signalingState, ev);
+    };
     let tracksNumber = 0;
     this.peers[peerId].ontrack = ({ streams: [ remoteStream ] }) => {
       tracksNumber++;
@@ -45,21 +51,30 @@ export const inputEvents = {
     if (createOffer) {
       console.log('createOffer = true');
       const offer = await this.peers[peerId].createOffer()
+      console.log('setLocal offer');
       await this.peers[peerId].setLocalDescription(offer)
-      this.socket.emit(EVENTS.ACCEPT_SDP, { peerId, sessionDescription: offer })
+      this.socket.emit(EVENTS.ACCEPT_SDP, { peerId, to: peerId, sessionDescription: offer })
     }
     return;
   },
   [EVENTS.SESSION_DESCRIPTION]: async function ({ peerId, sessionDescription: remoteDescription }) {
-    console.log('got desc');
-    await this.peers[peerId]?.setRemoteDescription(
+    console.log('got desc', remoteDescription);
+    console.log('recived setRemote', remoteDescription.type);
+    console.log({
+      peers: this.peers,
+      to: peerId,
+      me: this.socket.id
+    });
+    await Object.values(this.peers)[0]?.setRemoteDescription(
       new RTCSessionDescription(remoteDescription)
-    );
-
+    ).then(() => {
+      console.log('setRemoteDescription done');
+    });
     if (remoteDescription.type === 'offer') {
       const answer = await this.peers[peerId].createAnswer();
+      console.log('setLocal answer');
       await this.peers[peerId].setLocalDescription(answer);
-      console.log('createAnswer');
+      console.log('createAnswer for ', peerId);
       this.socket.emit(EVENTS.ACCEPT_SDP, {
         peerId,
         sessionDescription: answer,
