@@ -36,7 +36,7 @@
       </v-row>
     </div>
     <SettingsModal
-      @nicknameUpdated="onNicknameUpdated(); setNotification()"
+      @nicknameUpdated="onNicknameUpdated(); setNotification();"
     />
     <AcquaintanceModal
       @userCreated="onNicknameUpdated"
