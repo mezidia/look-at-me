@@ -97,7 +97,6 @@ export default class RoomPage extends Vue {
   @Mutation deleteUser;
   @Mutation updateDevicesStatus;
   @Mutation updateNameStatus;
-  @Mutation setPeerId;
 
   @AddRoomState clicked
   @AddRoomState generatedRoomId
@@ -200,6 +199,7 @@ export default class RoomPage extends Vue {
 
   onNicknameUpdated() {
     this.updateNickname(window.localStorage.getItem('myNickname'));
+    this.socket.emit(EVENTS.SHARE_USER_INFO, { roomId: this.roomId, nickName: this.nickname, isAdmin: this.isNewRoom })
   }
 
   setNotification() {

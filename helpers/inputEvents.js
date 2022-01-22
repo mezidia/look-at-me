@@ -28,7 +28,7 @@ export const inputEvents = {
     let tracksNumber = 0;
     this.peers[peerId].ontrack = ({ streams: [remoteStream] }) => {
       tracksNumber++;
-      this.addUser(peerId, remoteStream);
+      this.addUser({ peerId, remoteStream });
       const peerVideo = document.getElementById('video' + peerId);
       if (tracksNumber === 2) {
         tracksNumber = 0
@@ -94,6 +94,7 @@ export const inputEvents = {
     console.log(msg);
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    this.updateNameStatus({ clientId, nickName, isAdmin });
+    console.log(this.socket.id, clientId, nickName, isAdmin)
+    if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
   }
 }
