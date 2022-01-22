@@ -35,7 +35,17 @@
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
+    <SettingsModal />
     <AcquaintanceModal />
+    <div
+      class="settings-wrapper"
+      @click="updateSettingsModal(true)"
+    >
+      <VuetifyIcon
+        iconName="mdi-cog"
+        class="settings-button"
+      />
+    </div>
   </div>
 </template>
 
@@ -44,6 +54,9 @@ import { Vue, namespace, Component } from 'nuxt-property-decorator'
 import UserBlock from '../../components/UserBlock.vue'
 import OnOffIcon from '../../components/OnOffIcon.vue'
 import BasicButton from '../../components/BasicButton.vue'
+import VuetifyIcon from '../../components/VuetifyIcon.vue'
+import SettingsModal from '../../components/SettingsModal.vue'
+
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
@@ -51,9 +64,10 @@ import socketIo from '../../helpers/socketIo.js'
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
 const { Mutation: NicknameModalMutation } = namespace('nicknameModal')
+const { Mutation: SettingsModalMutation } = namespace('settingsModal')
 
 @Component({
-  components: {UserBlock, OnOffIcon, BasicButton}
+  components: {UserBlock, OnOffIcon, BasicButton, VuetifyIcon, SettingsModal}
 })
 
 export default class RoomPage extends Vue {
@@ -65,6 +79,8 @@ export default class RoomPage extends Vue {
   @AddRoomState generatedRoomId
 
   @NicknameModalMutation updateNicknameModal
+
+  @SettingsModalMutation updateSettingsModal
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -166,5 +182,11 @@ div#room-holder {
 
 .v-icon.v-icon::after {
   height: 0%;
+}
+
+.settings-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 </style>

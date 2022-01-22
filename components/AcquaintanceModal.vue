@@ -59,8 +59,10 @@ export default class AcquaintanceModal extends Vue {
       return;
     }
     console.log(this.nickname);
+    window.localStorage.setItem('myNickname', this.inputNickname);
     this.setNickname(this.inputNickname);
     this.updateNicknameModal(false);
+    console.log('Nick from storage:', window.localStorage.getItem('myNickname'));
   }
 
   mounted() {
