@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import { Component, Vue, namespace, Prop } from 'nuxt-property-decorator'
-import { BasicButton } from './BasicButton.vue'
+import { Component, Vue, namespace } from 'nuxt-property-decorator'
+import BasicButton from './BasicButton.vue'
 
 const { State, Action } = namespace('user')
 const { State: ModalState, Action: ModalAction } = namespace('modal');
