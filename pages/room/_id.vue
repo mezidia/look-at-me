@@ -1,5 +1,6 @@
 <template>
   <div id="room-holder">
+    <h1>{{ socket.id }}</h1>
     <v-row
     v-if="pageLoading"
     justify="center">
@@ -13,7 +14,7 @@
       
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock :id="'1'" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          <UserBlock :id="socket.id" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
           <UserBlock :id="user.peerId" v-for="user in users" :key="user.peerId" :name="user.name" :pageLoading="pageLoading" :image="image" :cameraOn="user.cameraOn" :micClicked="user.micOn" :width="width" :height="height"/>
         </v-row>
       </v-row>
@@ -47,6 +48,7 @@ import BasicButton from '../../components/BasicButton.vue'
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
+import events from '../../helpers/events'
 
 const { State, Mutation } = namespace('room')
 
@@ -72,21 +74,22 @@ export default class RoomPage extends Vue {
   peers = {};
   clients = [];
   rooms = [];
+  peerId = '1';
 
-  beforeCreate() {
+  async created() {
     this.roomId = this.$route.path.split('/')[2]
-
+    this.socket = socketIo();
+    await new Promise(resolve => this.socket.on('connect', resolve))
   }
 
-  async mounted() {
-    this.socket = socketIo();
-    
+  async mounted() {    
+    console.log(this.socket, this.socket.connected)
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
 
-    const video = document.getElementById('video1');
+    const video = document.getElementById('video' + this.socket.id);
     await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
       video.srcObject = stream;
@@ -97,6 +100,11 @@ export default class RoomPage extends Vue {
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
+  }
+
+  beforeUnmount() {
+    console.log('unmount');
+    this.closeSockets()
   }
 
   cameraClick() {
@@ -125,9 +133,16 @@ export default class RoomPage extends Vue {
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
   }
 
+  closeSockets() {
+    const roomId = this.roomId;
+    // this.stream.getTracks().forEach(track => track.stop());
+     this.socket.emit(events.LEAVE, { roomId });
+    // this.socket.close();
+  }
+
   leaveRoom() {
-    this.stream.getTracks().forEach(track => track.stop());
-    // leave room
+    this.closeSockets();
+    window.location.replace('http://localhost:3000/');
   }
 }
 </script>

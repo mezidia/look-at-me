@@ -8,7 +8,6 @@ export const state = () => ({
 export const mutations = {
   addUser (state, peerId, stream) {
     Vue.set(state.users, peerId, { peerId, stream, name: peerId, cameraOn: true, micOn: true })
-    console.log(2, state.users)
   },
   setRoomId (state, roomId) {
     state.roomId = roomId
