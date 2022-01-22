@@ -60,6 +60,7 @@ export default class RoomPage extends Vue {
   @State users;
   @Mutation addUser;
   @Mutation deleteUser;
+  @Mutation updateDevicesStatus;
 
   @AddRoomState clicked
   @AddRoomState generatedRoomId
@@ -80,6 +81,7 @@ export default class RoomPage extends Vue {
   clients = [];
   rooms = [];
   peerId = '1';
+  dcs = [];
 
   beforeCreate() {
     console.log('before create')
@@ -102,7 +104,8 @@ export default class RoomPage extends Vue {
     .then(stream => {
       this.stream = stream;
       video.srcObject = stream;
-      this.captureMedia();
+      this.stream.getVideoTracks()[0].enabled = false;
+      this.stream.getAudioTracks()[0].enabled = false;
       this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
     })
     .catch(err => console.log('An error occurred: ' + err));
@@ -110,12 +113,14 @@ export default class RoomPage extends Vue {
   }
 
   cameraClick() {
+    if (this.dcs.length === 0) return;
     this.cameraOn = !this.cameraOn;
     this.captureMedia();
     this.showVideo = !this.showVideo;
   }
 
   micClick() {
+    if (this.dcs.length === 0) return;
     this.micOn = !this.micOn;
     this.captureMedia();
   }
@@ -126,6 +131,7 @@ export default class RoomPage extends Vue {
 
     if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
     else this.stream.getAudioTracks()[0].enabled = false;
+    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0].enabled })))
   }
 
   copyLink() {

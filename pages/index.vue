@@ -33,7 +33,7 @@ import { v4 as uuidv4 } from 'uuid'
 const { Action, State } = namespace('modal');
 const { State: UserState } = namespace('user');
 const { Mutation: AddRoomMutation, State: AddRoomClickState } = namespace('addRoomClick');
-const { Action: RoomAction } = namespace('room');
+const { Mutation: RoomMutation } = namespace('room');
 
 @Component({
   components: {BasicButton, AcquaintanceModal}
@@ -47,7 +47,7 @@ export default class IndexPage extends Vue {
   @AddRoomMutation updateClicked
   @AddRoomMutation updateGeneratedRoomId
 
-  @RoomAction setRoomId
+  @RoomMutation setRoomId
 
   mounted() {
     this.updateClicked(false);
