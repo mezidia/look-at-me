@@ -83,30 +83,24 @@ export default class RoomPage extends Vue {
   rooms = [];
   peerId = '1';
 
-<<<<<<< HEAD
   async created() {
     this.roomId = this.$route.path.split('/')[2]
+    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
     await new Promise(resolve => this.socket.on('connect', resolve))
   }
 
-  async mounted() {    
-    console.log(this.socket, this.socket.connected)
-=======
+
   beforeCreate() {
     this.roomId = this.$route.path.split('/')[2];
   }
 
-  created() {
-    this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
-  }
 
   async mounted() {
     console.log(this.isNewRoom);
     this.setModal(true);
     this.socket = socketIo();
     
->>>>>>> ffd44b09c120f9231dd7bd4b7adac017cbfa09c5
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
@@ -125,10 +119,10 @@ export default class RoomPage extends Vue {
     this.pageLoading = false;
   }
 
-  beforeUnmount() {
-    console.log('unmount');
-    this.closeSockets()
-  }
+  // beforeUnmount() {
+  //   console.log('unmount');
+  //   this.closeSockets()
+  // }
 
   cameraClick() {
     this.cameraOn = !this.cameraOn;
@@ -157,15 +151,14 @@ export default class RoomPage extends Vue {
   }
 
   closeSockets() {
-    const roomId = this.roomId;
-    // this.stream.getTracks().forEach(track => track.stop());
-     this.socket.emit(events.LEAVE, { roomId });
-    // this.socket.close();
+    this.stream.getTracks().forEach(track => track.stop());
+    this.socket.emit(events.LEAVE, { roomId: this.roomId });
+    this.socket.close();
   }
 
   leaveRoom() {
     this.closeSockets();
-    window.location.replace('http://localhost:3000/');
+    //window.location.replace('http://localhost:3000/');
   }
 }
 </script>
