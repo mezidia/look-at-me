@@ -58,9 +58,12 @@ const { Mutation: NicknameModalMutation } = namespace('nicknameModal')
 
 export default class RoomPage extends Vue {
   @State users;
+  @State userStatus;
   @Mutation addUser;
   @Mutation deleteUser;
   @Mutation updateDevicesStatus;
+  @Mutation updateNameStatus;
+  @Mutation setPeerId;
 
   @AddRoomState clicked
   @AddRoomState generatedRoomId
@@ -93,6 +96,10 @@ export default class RoomPage extends Vue {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     console.log('mounted')
     this.socket = socketIo();
+    // this.socket.onconnect = () => {
+    //   console.log()
+    //   this.peerId = this.socket.id
+    // }
     this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {

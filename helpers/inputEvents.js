@@ -92,5 +92,8 @@ export const inputEvents = {
   },
   [EVENTS.ERROR]: async function ({ msg }) {
     console.log(msg);
+  },
+  [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
+    this.updateNameStatus({ clientId, nickName, isAdmin });
   }
 }
