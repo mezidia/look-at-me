@@ -23,7 +23,7 @@ export const inputEvents = {
     let tracksNumber = 0;
     this.peers[peerId].ontrack = ({ streams: [ remoteStream ] }) => {                 ////ontrack
       tracksNumber++;
-      this.newUser(peerId, remoteStream);
+      this.addUser(peerId, remoteStream);
       const peerVideo = document.getElementById('video' + peerId);
       if (tracksNumber === 2) {
         tracksNumber = 0
@@ -35,7 +35,7 @@ export const inputEvents = {
             console.log('stream sed goood');
             peerVideo.srcObject = remoteStream;
             peerVideo.play()
-            console.log('rooms', peerId, this.socket.id)
+            console.log('peers', peerId, this.socket.id)
             settled = true;
           }
           if (settled) {
@@ -93,16 +93,15 @@ export const inputEvents = {
     return;
   },
   [EVENTS.REMOVE_PEER]: async function ({ peerId }) {
-    console.log('leave', peerId);
+    console.log('leave', peerId)
+    this.deleteUser(peerId);
+
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
     
-
     delete this.peers[peerId];
     delete this.peers[peerId];
-
-    // updateClients(list => list.filter(c => c !== peerId)); //update clients!
     return;
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {

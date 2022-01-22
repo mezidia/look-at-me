@@ -1,16 +1,19 @@
+import { Vue } from 'nuxt-property-decorator'
+
 export const state = () => ({
-  users: [],
+  users: {},
   roomId: null
 })
 
 export const mutations = {
   addUser (state, peerId, stream) {
-    const ans = state.users.reduce((prev, user) => prev || (peerId === user.peerId), false)
-    if (!ans) {
-      state.users.push({ peerId, stream, name: peerId, cameraOn: true, micOn: true })
-    }
+    Vue.set(state.users, peerId, { peerId, stream, name: peerId, cameraOn: true, micOn: true })
+    console.log(2, state.users)
   },
   setRoomId (state, roomId) {
     state.roomId = roomId
+  },
+  deleteUser (state, peerId) {
+    Vue.delete(state.users, peerId)
   }
 }

@@ -58,6 +58,7 @@ const { State, Mutation } = namespace('room')
 export default class RoomPage extends Vue {
   @State users;
   @Mutation addUser;
+  @Mutation deleteUser;
 
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
@@ -100,10 +101,6 @@ export default class RoomPage extends Vue {
     })
     .catch(err => console.log('An error occurred: ' + err));
     this.pageLoading = false;
-  }
-
-  newUser(peerId, stream) { //add camera on, mic on, name
-    this.addUser(peerId, stream);
   }
 
   cameraClick() {
