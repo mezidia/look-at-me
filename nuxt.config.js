@@ -41,7 +41,26 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: "AIzaSyBPz4Zxfm4yzfSVDCBkduXwJ1rkc_Ijofo",
+          authDomain: "look-at-me-ad51b.firebaseapp.com",
+          databaseURL: "https://look-at-me-ad51b-default-rtdb.firebaseio.com",
+          projectId: "look-at-me-ad51b",
+          storageBucket: "look-at-me-ad51b.appspot.com",
+          messagingSenderId: "351256565139",
+          appId: "1:351256565139:web:c64aefbca0298e0467c466",
+          measurementId: "G-0K3XC5WBM1"
+        },
+        services: {
+          auth: true,
+          firestore: true
+        }
+      }
+    ]
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
