@@ -15,7 +15,7 @@
         <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
           <div
             class="hover-pointer"
-            @click="unselectUser()"
+            @dblclick="unselectUser()"
           >
             <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo" :pageLoading="pageLoading" :image="image" :micClicked="focusedUser ? focusedUser.micOn : micOn" :width="600" :height="450"/>
           </div>
@@ -23,7 +23,7 @@
         <v-row id="users-panel" class="fill-height" justify="center">
           <div
             class="hover-pointer"
-            @click="selectUser(peerId, 'You')"
+            @dblclick="selectUser(peerId, 'You')"
             v-show="focusedId !== peerId"
           >
             <UserBlock
@@ -40,7 +40,7 @@
           </div>
           <div
             class="hover-pointer"
-            @click="selectUser(user.peerId, user.name, user)"
+            @dblclick="selectUser(user.peerId, user.name, user)"
             v-for="user in users"
             :key="user.peerId"
             :id="user.peerId"
@@ -52,7 +52,7 @@
               :name="user.name"
               :pageLoading="pageLoading"
               :image="image"
-              :admin="isNewRoom"
+              :admin="admin"
               @removePersonFromRoom="removePersonFromRoom"
               :cameraOn="user.cameraOn"
               :micClicked="user.micOn"
@@ -78,7 +78,7 @@
           <span id="copy-link-tooltip">Copy Link</span>
         </v-tooltip>
         <v-spacer></v-spacer>
-        <p v-if="!mediaAvailable">Wait for the others to stream 	&#127909;</p>
+        <p v-if="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>

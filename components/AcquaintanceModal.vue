@@ -7,7 +7,7 @@
   >
     <v-card>
       <v-card-text>
-        <h3 class="pt-3 headline">Write down your nickname:</h3>
+        <h3 class="pt-3 headline">Інтродьюс юорселф, галушка:</h3>
         <input
           autocomplete="off"
           class="mt-3 pa-2"
