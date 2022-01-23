@@ -1,5 +1,7 @@
 import freeice from 'freeice'
 import EVENTS from './events'
+import onDataChannelMessage from './dataChannels';
+import msgTypes from './dataChannels/msgTypes';
 
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
@@ -9,17 +11,28 @@ export const inputEvents = {
     }
 
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
+
+
+
     this.peers[peerId].ondatachannel = e => {
       e.channel.onopen = () => {};
-      e.channel.onmessage = e => {
-        const data = JSON.parse(e.data);
-        this.updateDevicesStatus({ peerId, devices: data });
-      };
+      e.channel.onmessage = onDataChannelMessage.bind(this)
     } 
-    const dc = this.peers[peerId].createDataChannel('devicesStatus');
+    const dc = await this.peers[peerId].createDataChannel('devicesStatus');
     this.dcs.push(dc);
-    dc.onopen = () => dc.send(JSON.stringify({cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0].enabled}));
-    dc.onmessage = e => console.log('Message: ', e.data);
+    dc.onopen = () => {
+      console.log('channel opened');
+      console.log('is camera on', this.stream.getVideoTracks()[0].enabled);
+      dc.send(JSON.stringify({
+        type: msgTypes.DEVICES_STATUS,
+        args: {peerId, cameraOn: this.stream.getVideoTracks()[0].enabled}
+      }));
+    } //, micOn: this.stream.getAudioTracks()[0].enabled}
+
+
+
+
+
     this.peers[peerId].onicecandidate = (event) => {
       if (event.candidate) {
         this.socket.emit(EVENTS.ACCEPT_ICE, { peerId, iceCandidate: event.candidate})
@@ -30,12 +43,14 @@ export const inputEvents = {
       tracksNumber++;
       this.addUser(peerId, remoteStream);
       const peerVideo = document.getElementById('video' + peerId);
-      if (tracksNumber === 2) {
+      console.log(tracksNumber, remoteStream, peerVideo)
+      if (tracksNumber === 2 || tracksNumber === 1) {
         tracksNumber = 0
         if (this.clients.includes(peerId)) return;
         let settled = false;
         const interval = setInterval(() => {
           if (peerVideo) {
+            console.log('stream set');
             peerVideo.srcObject = remoteStream;
             peerVideo.play()
             settled = true;
