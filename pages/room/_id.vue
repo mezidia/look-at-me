@@ -13,7 +13,7 @@
       
       <v-row justify="start" align="start">
         <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock :id="peerId" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          <UserBlock :id="peerId" muted name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
           <UserBlock :id="user.peerId" v-for="user in users" :key="user.peerId" :name="user.name" :pageLoading="pageLoading" :image="image" :cameraOn="user.cameraOn" :micClicked="user.micOn" :width="width" :height="height"/>
         </v-row>
       </v-row>
@@ -144,6 +144,12 @@ export default class RoomPage extends Vue {
   async mounted() {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
+    // window.onbeforeunload = () => {
+    //   this.dcs.forEach(dc => dc.close());
+    //   Object.values(this.peers).forEach(peer => peer.close())
+    //   this.socket.close();
+    //   return true;
+    // }
     // this.socket.onconnect = () => {
     //   console.log()
     //   this.peerId = this.socket.id
@@ -195,7 +201,7 @@ export default class RoomPage extends Vue {
 
     if (this.micOn && this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = true;
     else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
-    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled}))) //, micOn: this.stream.getAudioTracks()[0].enabled 
+    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled })));
   }
 
   async switchDataSource() {
@@ -205,7 +211,7 @@ export default class RoomPage extends Vue {
   }
 
   copyLink() {
-    window.navigator.clipboard.writeText($nuxt.$route.fullPath);
+    window.navigator.clipboard.writeText(window.location.pathname);
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);

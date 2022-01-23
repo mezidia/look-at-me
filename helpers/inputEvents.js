@@ -14,18 +14,14 @@ export const inputEvents = {
       e.channel.onmessage = (e) => {
         console.log(e.data);
         const data = JSON.parse(e.data);
-        // if (data.updateStreamFrom) {
-        //   document.getElementById('video' + updateStreamFrom).srcObject = 
-        //   return;
-        // }
         this.updateDevicesStatus({ peerId, devices: data });
       }
     }
     const dc = await this.peers[peerId].createDataChannel('devicesStatus');
     this.dcs.push(dc);
     dc.onopen = () => {
-      dc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled}));
-    } //, micOn: this.stream.getAudioTracks()[0].enabled}
+      dc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled }));
+    }
 
 
 
@@ -96,7 +92,6 @@ export const inputEvents = {
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
-    
     delete this.peers[peerId];
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
@@ -106,7 +101,6 @@ export const inputEvents = {
     this.$router.push({path: '/error'})
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    console.log(this.socket.id, clientId, nickName, isAdmin)
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
   }
 }
