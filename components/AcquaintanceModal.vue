@@ -4,6 +4,7 @@
     v-model="nicknameModal"
     @keydown.enter="onSubmitClick"
     persistent
+    :overlay-opacity="0.95"
   >
     <v-card>
       <v-card-text>
@@ -28,6 +29,7 @@
         <BasicButton
           text="Submit"
           :onClick="onSubmitClick"
+          color="#40826d"
         />
       </v-card-actions>
     </v-card>
