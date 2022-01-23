@@ -17,7 +17,7 @@
             class="hover-pointer"
             @dblclick="unselectUser()"
           >
-            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo" :pageLoading="pageLoading" :image="image" :micClicked="focusedUser ? focusedUser.micOn : micOn" :width="600" :height="450"/>
+            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo" :pageLoading="pageLoading" :image="image" :micClicked="focusedUser ? focusedUser.micOn : micOn" :width="720" :height="405"/>
           </div>
         </v-row>
         <v-row id="users-panel" class="fill-height" justify="center">
