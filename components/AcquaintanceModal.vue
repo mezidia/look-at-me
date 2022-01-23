@@ -29,6 +29,7 @@
         <BasicButton
           text="Submit"
           :onClick="onSubmitClick"
+          color="#40826d"
         />
       </v-card-actions>
     </v-card>

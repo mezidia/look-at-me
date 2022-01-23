@@ -38,6 +38,7 @@
         </v-btn>
         <v-btn
           @click="onConfirm"
+          color="#40826d"
         >
           Confirm
         </v-btn>
