@@ -17,6 +17,7 @@ As a member you are able to:
 
 As the owner of room your additional ability is removing other users.
 
+Also you are able to see a surprise from the developers by clicking the other button.
 
 ## Build Setup
 
