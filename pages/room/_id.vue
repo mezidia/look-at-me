@@ -12,20 +12,20 @@
     <div :style="{'visibility': pageLoading ? 'hidden' : 'visible'}">
       
       <v-container justify="start" align="start">
-        <v-row v-if="focusedId" id="selectedPanel" class="fill-height" justify="center">
+        <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
           <div
             @click="unselectUser()"
           >
-            <UserBlock :id="focusedId" :name="focusedName" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" width="600" height="450"/>
+            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="600" :height="450"/>
           </div>
         </v-row>
         <v-row id="users-panel" class="fill-height" justify="center">
           <div
             @click="selectUser(peerId, 'You')"
-            v-if="focusedId !== peerId"
+            v-show="focusedId !== peerId"
           >
             <UserBlock
-              :id="peerId" name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+              :id="peerId" muted name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
           </div>
           <div
             @click="selectUser(user.peerId, user.name)"
@@ -35,7 +35,7 @@
             :name="user.name"
           >
             <UserBlock
-              v-if="user.peerId !== focusedId"
+              v-show="user.peerId !== focusedId"
               :id="user.peerId"
               :name="user.name"
               :pageLoading="pageLoading"
@@ -62,6 +62,7 @@
         </v-tooltip>
         <v-spacer></v-spacer>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
+        <BasicButton class="mx-3" text="Data source" :onClick="switchDataSource" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -101,6 +102,7 @@ import NotificationSnackbar from '../../components/NotificationSnackbar.vue'
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
+import dataSources from '../../helpers/dataSources'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -160,17 +162,26 @@ export default class RoomPage extends Vue {
   rooms = [];
   peerId = '1';
   dcs = [];
+  dataSource = 'webCamera';
 
   beforeCreate() {
-    console.log('before create')
     this.roomId = this.$route.path.split('/')[2];
   }
 
+  setDefaultStreamSettings(stream) {
+    stream.getVideoTracks().forEach(track => track.enabled = false);
+    stream.getAudioTracks().forEach(track => track.enabled = false);
+  }
+
   async mounted() {
-    this.roomId = this.$route.path.split('/')[2]
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
-    console.log('mounted')
     this.socket = socketIo();
+    // window.onbeforeunload = () => {
+    //   this.dcs.forEach(dc => dc.close());
+    //   Object.values(this.peers).forEach(peer => peer.close())
+    //   this.socket.close();
+    //   return true;
+    // }
     // this.socket.onconnect = () => {
     //   console.log()
     //   this.peerId = this.socket.id
@@ -182,15 +193,11 @@ export default class RoomPage extends Vue {
     }
 
     const video = document.getElementById('video1');
-    await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-    .then(stream => {
-      this.stream = stream;
-      video.srcObject = stream;
-      this.stream.getVideoTracks()[0].enabled = false;
-      this.stream.getAudioTracks()[0].enabled = false;
-      this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
-    })
-    .catch(err => console.log('An error occurred: ' + err));
+    this.stream = await dataSources[this.dataSource]() // opts = { video: true, audio: true } : default
+      .catch(err => console.log('An error occurred: ' + err));
+    this.setDefaultStreamSettings(this.stream)
+    video.srcObject = this.stream;
+    this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
     this.pageLoading = false;
   }
 
@@ -207,17 +214,36 @@ export default class RoomPage extends Vue {
     this.captureMedia();
   }
 
+  changeDataSource(source) {
+    this.stream = source
+    for (const peer of Object.values(this.peers)) {
+      this.stream.getTracks().forEach(track => {
+        const sender = peer.getSenders()
+          .find((s) => s.track.kind == track.kind);
+        sender.replaceTrack(track);
+      })
+    }
+
+    document.getElementById('video1').srcObject = this.stream;
+  }
+
   captureMedia() {
     if (this.cameraOn) this.stream.getVideoTracks()[0].enabled = true;
     else this.stream.getVideoTracks()[0].enabled = false;
 
-    if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
-    else this.stream.getAudioTracks()[0].enabled = false;
-    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0].enabled })))
+    if (this.micOn && this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = true;
+    else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
+    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled })));
+  }
+
+  async switchDataSource() {
+    console.log(this.dataSource === 'webCamera' ? 'screenCast' : 'webCamera');
+    this.dataSource = this.dataSource === 'webCamera' ? 'screenCast' : 'webCamera';
+    await this.changeDataSource(await dataSources[this.dataSource]())
   }
 
   copyLink() {
-    window.navigator.clipboard.writeText(window.location.href);
+    window.navigator.clipboard.writeText(window.location.pathname);
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
@@ -226,7 +252,7 @@ export default class RoomPage extends Vue {
   leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
     this.socket.disconnect();
-    window.location.replace('http://localhost:3000/');
+    this.$router.push({path: '/'})
   }
 
   onNicknameUpdated() {
@@ -242,6 +268,19 @@ export default class RoomPage extends Vue {
   selectUser(peerId, userName) {
     this.focusedId = peerId;
     this.focusedName = userName;
+    
+    const selectedSlot = document.getElementById('videofocusedId');
+    const selectedId = 'video' + peerId;
+    const video = document.getElementById(selectedId);
+    console.log('video, selectedSlot:');
+    console.log(video, selectedSlot);
+    console.log(video.srcObject);
+    const stream = video.srcObject;
+    video.srcObject = null;
+    video.srcObject = stream;
+    selectedSlot.srcObject = stream;
+    selectedSlot.style.visibility = 'visible';
+    console.log(selectedSlot.srcObject);
   }
 
   unselectUser() {

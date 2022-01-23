@@ -11,15 +11,21 @@ export const inputEvents = {
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
     this.peers[peerId].ondatachannel = e => {
       e.channel.onopen = () => {};
-      e.channel.onmessage = e => {
+      e.channel.onmessage = (e) => {
+        console.log(e.data);
         const data = JSON.parse(e.data);
         this.updateDevicesStatus({ peerId, devices: data });
-      };
-    } 
-    const dc = this.peers[peerId].createDataChannel('devicesStatus');
+      }
+    }
+    const dc = await this.peers[peerId].createDataChannel('devicesStatus');
     this.dcs.push(dc);
-    dc.onopen = () => dc.send(JSON.stringify({cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0].enabled}));
-    dc.onmessage = e => console.log('Message: ', e.data);
+    dc.onopen = () => {
+      dc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled }));
+    }
+
+
+
+
     this.peers[peerId].onicecandidate = (event) => {
       if (event.candidate) {
         this.socket.emit(EVENTS.ACCEPT_ICE, { peerId, iceCandidate: event.candidate})
@@ -30,12 +36,14 @@ export const inputEvents = {
       tracksNumber++;
       this.addUser({ peerId, remoteStream });
       const peerVideo = document.getElementById('video' + peerId);
-      if (tracksNumber === 2) {
+      console.log(tracksNumber, remoteStream, peerVideo)
+      if (tracksNumber === 2 || tracksNumber === 1) {
         tracksNumber = 0
         if (this.clients.includes(peerId)) return;
         let settled = false;
         const interval = setInterval(() => {
           if (peerVideo) {
+            console.log('stream set');
             peerVideo.srcObject = remoteStream;
             peerVideo.play()
             settled = true;
@@ -84,17 +92,15 @@ export const inputEvents = {
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
-    
     delete this.peers[peerId];
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
     this.socket.rooms = rooms
   },
   [EVENTS.ERROR]: async function ({ msg }) {
-    console.log(msg);
+    this.$router.push({path: '/error'})
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    console.log(this.socket.id, clientId, nickName, isAdmin)
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
   }
 }
