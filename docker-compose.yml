@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  look-be:
+    build: ./look-at-me-api   # will be replaced with `image: link to container in registry`
+    container_name: look-be
+    restart: always
+    ports:
+      - 8080:8080
+  look-ui:
+    build: ./look-at-me       # will be replaced with `image: link to container in registry`
+    container_name: look-ui
+    ports:
+      - 3000:3000
+    links:
+      - look-be
