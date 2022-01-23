@@ -320,6 +320,7 @@ export default class RoomPage extends Vue {
   }
 
   selectUser(peerId, userName, user) {
+    this.unselectUser();
     this.focusedId = peerId;
     this.focusedName = userName;
     
