@@ -18,7 +18,7 @@
           @input="showFormError = false"
         >
         <p
-          v-if="showFormError"
+          v-show="showFormError"
           class="form-error"
         >
           Please enter your nickname

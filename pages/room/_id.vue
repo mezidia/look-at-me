@@ -1,7 +1,7 @@
 <template>
   <div id="room-holder">
     <v-row
-    v-if="pageLoading"
+    v-show="pageLoading"
     justify="center">
       <v-progress-circular
       :width="3"
@@ -108,7 +108,7 @@
           <span id="copy-link-tooltip">Copy Link</span>
         </v-tooltip>
         <v-spacer></v-spacer>
-        <p v-if="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
+        <p v-show="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
@@ -359,7 +359,7 @@ export default class RoomPage extends Vue {
     await this.awaitResponse(events.REMOVE_PEER, Object.values(this.peers).length)
     this.dcs.forEach(dc => dc.close());
     this.socket.disconnect();
-    window.location.replace('http://localhost:3000/');
+    this.$router.replace({ path: '/'});
   }
 
   onNicknameUpdated() {

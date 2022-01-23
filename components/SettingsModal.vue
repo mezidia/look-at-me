@@ -22,7 +22,7 @@
           @input="showFormError = false"
         >
         <p
-          v-if="showFormError"
+          v-show="showFormError"
           class="form-error"
         >
           Please enter your nickname
@@ -69,7 +69,6 @@ export default class AcquaintanceModal extends Vue {
     window.localStorage.setItem('myNickname', this.inputNickname);
     this.$emit('nicknameUpdated');
     this.updateSettingsModal(false);
-    console.log('Nick from storage:', window.localStorage.getItem('myNickname'));
   }
 
 }

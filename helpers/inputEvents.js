@@ -10,12 +10,10 @@ export const inputEvents = {
 
     const channelHandlers = {
       devicesStatus: (e) => {
-        console.log('devicesStatus', e.data);
         const data = JSON.parse(e.data);
         this.updateDevicesStatus({ peerId, devices: data });
       },
       kik: async (e) => {
-        console.log('kik', e.data);
         await this.leaveRoom();
       },
     }
@@ -105,10 +103,8 @@ export const inputEvents = {
   },
   [EVENTS.ERROR]: async function ({ msg }) {
     if (msg === '404') this.$router.push({path: '/error'})
-    else console.log('Error! ' + msg);
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    console.log('ACCEPT_USER_INFO me:', this.socket.id, { clientId, nickName, isAdmin });
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
     else if (isAdmin) this.admin = true;
   }

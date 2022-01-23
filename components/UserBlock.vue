@@ -9,7 +9,7 @@
     <video :style="{'visibility': !cameraOn ? 'hidden' : 'visible'}" autoplay :width="width + 'px'" :height="height + 'px'" :id="'video' + id" :muted="muted"></video>
     <v-row class="user-options">
       <OnOffIcon iconName="mdi-microphone" :pointer="false" :clicked="micClicked"/>
-      <OnOffIcon v-if="admin" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
+      <OnOffIcon v-show="admin" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
     </v-row>
   </v-card>
 </template>

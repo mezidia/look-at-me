@@ -4,7 +4,7 @@
     :x-large="big"
     :disabled="!pointer"
     :class="{'ma-3': big}">{{ iconName }}</v-icon>
-    <hr v-if="!clicked" :style="{ 'left': big ? '15%' : '-3%', 'opacity': big ? '1' : '0.5'}">
+    <hr v-show="!clicked" :style="{ 'left': big ? '15%' : '-3%', 'opacity': big ? '1' : '0.5'}">
   </div>
 </template>
 

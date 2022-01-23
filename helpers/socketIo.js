@@ -8,7 +8,8 @@ const options = {
   "force new connection": true,
   reconnectionAttempts: "Infinity",
   timeout : 10000,
-  transports : ["websocket"]
+  transports : ["websocket"],
+  secure: true
 }
 
 export default () => io(serverUrl, options);
