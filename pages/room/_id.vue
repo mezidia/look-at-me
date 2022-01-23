@@ -63,9 +63,9 @@
         </v-row>
       </v-container>
       <v-row class="play-icon-row">
-        <OnOffIcon class="mx-3" big iconName="mdi-microphone" :onClick="micClick" :clicked="micOn"/>
-        <OnOffIcon class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo && !screenSharing"/>
-        <OnOffIcon class="mx-3" big iconName="mdi-monitor-screenshot" :onClick="screenSharingClick" :clicked="screenSharing"/>
+        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-microphone" :onClick="micClick" :clicked="micOn"/>
+        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo && !screenSharing"/>
+        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-monitor-screenshot" :onClick="screenSharingClick" :clicked="screenSharing"/>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-icon 
@@ -78,6 +78,7 @@
           <span id="copy-link-tooltip">Copy Link</span>
         </v-tooltip>
         <v-spacer></v-spacer>
+        <p v-if="!mediaAvailable">Wait for the others to stream 	&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
       </v-row>
     </div>
@@ -181,6 +182,10 @@ export default class RoomPage extends Vue {
   peerId = '1';
   dcs = [];
   dataSource = 'webCamera';
+
+  get mediaAvailable () {
+    return this.dcs.length > 0;
+  }
 
   beforeCreate() {
     this.roomId = this.$route.path.split('/')[2];
@@ -299,7 +304,7 @@ export default class RoomPage extends Vue {
   }
 
   copyLink() {
-    window.navigator.clipboard.writeText(window.location.pathname);
+    window.navigator.clipboard.writeText(window.location.href);
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);

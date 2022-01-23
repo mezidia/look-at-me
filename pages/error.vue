@@ -8,7 +8,7 @@
         <h1>Room not found</h1>
       </v-row>
       <v-row justify="center">
-        <RedirectButton to="/" text="Create Room" color="red"/>
+        <RedirectButton to="/" text="Main Page" color="red"/>
       </v-row>
     </v-col>
   </div>
