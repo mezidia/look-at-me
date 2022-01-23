@@ -1,7 +1,7 @@
 # look-at-me
 
 ## About application
-Look-at-me is platform for meetings that use WebRTC standard.
+Look-at-me is a platform for meetings that use the WebRTC standard.
 Look-at-me-api is located in this [repository](https://github.com/mezidia/look-at-me-api).
 Tech stack: fastify, socket.io and Nuxt.js for ui.
 
