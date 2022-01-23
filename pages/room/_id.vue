@@ -154,7 +154,7 @@ export default class RoomPage extends Vue {
   snackbarColor = '#40826d';
   snackbarText = 'Your nickname has been updated';
 
-  focusedName = null;
+  focusedName = '';
   focusedId = null;
   
   socket = null;
@@ -230,10 +230,16 @@ export default class RoomPage extends Vue {
       this.screenSharing = true;
       this.cameraOn = true;
       this.showVideo = true;
-    } else {
-      this.cameraOn = !this.cameraOn;
-      this.showVideo = !this.showVideo;
-      this.screenSharing = !this.screenSharing;
+    } else if (this.cameraOn) {
+      this.stream.getVideoTracks()[0].stop();
+      this.screenSharing = false;
+      this.cameraOn = false;
+      this.showVideo = false;
+    } else if (!this.cameraOn) {
+      await this.changeDataSource(await dataSources[this.dataSource]());
+      this.screenSharing = true;
+      this.cameraOn = true;
+      this.showVideo = true;
     }
     this.captureMedia();
   }
@@ -241,12 +247,13 @@ export default class RoomPage extends Vue {
   async changeDataSource(source) {
     const audioTrack = this.stream.getAudioTracks()[0];
     this.stream = source;
-    this.stream.getVideoTracks()[0].onended = async () => {
-      await this.switchDataSource();
-      this.screenSharing = false;
-      this.cameraOn = false;
-      this.showVideo = false;
-      this.captureMedia()
+    if (this.dataSource === 'screenCast') {
+      this.stream.getVideoTracks()[0].onended = async () => {
+        this.screenSharing = false;
+        this.cameraOn = false;
+        this.showVideo = false;
+        this.captureMedia();
+      };
     };
     for (const peer of Object.values(this.peers)) {
       this.stream.getTracks().forEach(track => {
