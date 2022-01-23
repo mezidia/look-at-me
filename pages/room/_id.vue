@@ -14,21 +14,33 @@
       <v-container justify="start" align="start">
         <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
           <div
+            class="hover-pointer"
             @click="unselectUser()"
           >
-            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="600" :height="450"/>
+            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo" :pageLoading="pageLoading" :image="image" :micClicked="focusedUser ? focusedUser.micOn : micOn" :width="600" :height="450"/>
           </div>
         </v-row>
         <v-row id="users-panel" class="fill-height" justify="center">
           <div
+            class="hover-pointer"
             @click="selectUser(peerId, 'You')"
             v-show="focusedId !== peerId"
           >
             <UserBlock
-              :id="peerId" muted name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+              :id="peerId"
+              muted
+              name="You"
+              :cameraOn="showVideo"
+              :pageLoading="pageLoading"
+              :image="image"
+              :micClicked="micOn"
+              :width="width"
+              :height="height"
+            />
           </div>
           <div
-            @click="selectUser(user.peerId, user.name)"
+            class="hover-pointer"
+            @click="selectUser(user.peerId, user.name, user)"
             v-for="user in users"
             :key="user.peerId"
             :id="user.peerId"
@@ -39,8 +51,10 @@
               :id="user.peerId"
               :name="user.name"
               :pageLoading="pageLoading"
-              :image="image" :cameraOn="user.cameraOn"
-              :micClicked="user.micOn" :width="width"
+              :image="image"
+              :cameraOn="user.cameraOn"
+              :micClicked="user.micOn"
+              :width="width"
               :height="height"
             />
           </div>
@@ -80,7 +94,6 @@
         class="settings-button"
       />
     </div>
-    {{ nickname }}
     <NotificationSnackbar
       :text="snackbarText"
       :snackbar="snackbar"
@@ -155,6 +168,7 @@ export default class RoomPage extends Vue {
 
   focusedName = null;
   focusedId = null;
+  focusedUser = null;
   
   socket = null;
   peers = {};
@@ -231,7 +245,7 @@ export default class RoomPage extends Vue {
     if (this.cameraOn) this.stream.getVideoTracks()[0].enabled = true;
     else this.stream.getVideoTracks()[0].enabled = false;
 
-    if (this.micOn && this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = true;
+    if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
     else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
     this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled })));
   }
@@ -265,27 +279,26 @@ export default class RoomPage extends Vue {
     setTimeout(() => this.snackbar = false, this.snackbarTimeout);
   }
 
-  selectUser(peerId, userName) {
+  selectUser(peerId, userName, user) {
     this.focusedId = peerId;
     this.focusedName = userName;
     
     const selectedSlot = document.getElementById('videofocusedId');
     const selectedId = 'video' + peerId;
     const video = document.getElementById(selectedId);
-    console.log('video, selectedSlot:');
-    console.log(video, selectedSlot);
-    console.log(video.srcObject);
     const stream = video.srcObject;
-    video.srcObject = null;
-    video.srcObject = stream;
     selectedSlot.srcObject = stream;
     selectedSlot.style.visibility = 'visible';
-    console.log(selectedSlot.srcObject);
+
+    if (user) {
+      this.focusedUser = user;
+    }
   }
 
   unselectUser() {
     this.focusedId = null;
     this.focusedName = null;
+    this.focusedUser = null;
   }
 }
 </script>
@@ -319,5 +332,9 @@ div#room-holder {
   position: absolute;
   top: 20px;
   right: 20px;
+}
+
+.hover-pointer:hover {
+  cursor: pointer;
 }
 </style>
