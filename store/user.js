@@ -4,9 +4,7 @@ export const state = () => ({
 
 export const actions = {
   setNickname (ctx, nickname) {
-    console.log(arguments)
     ctx.commit('updateNickname', nickname)
-    console.log(nickname)
   }
 }
 
