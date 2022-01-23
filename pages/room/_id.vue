@@ -390,7 +390,7 @@ export default class RoomPage extends Vue {
 
   unselectUser() {
     this.focusedId = null;
-    this.focusedName = null;
+    this.focusedName = '';
     this.focusedUser = null;
   }
 
