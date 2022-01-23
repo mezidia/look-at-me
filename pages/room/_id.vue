@@ -61,8 +61,9 @@
         </v-row>
       </v-container>
       <v-row class="play-icon-row">
-        <OnOffIcon class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo"/>
         <OnOffIcon class="mx-3" big iconName="mdi-microphone" :onClick="micClick" :clicked="micOn"/>
+        <OnOffIcon class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo && !screenSharing"/>
+        <OnOffIcon class="mx-3" big iconName="mdi-monitor-screenshot" :onClick="screenSharingClick" :clicked="screenSharing"/>
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-icon 
@@ -76,7 +77,6 @@
         </v-tooltip>
         <v-spacer></v-spacer>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
-        <BasicButton class="mx-3" text="Data source" :onClick="switchDataSource" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -155,6 +155,7 @@ export default class RoomPage extends Vue {
   image="https://picsum.photos/200/150?blur";
   cameraOn = false;
   showVideo = false;
+  screenSharing = false;
   micOn = false;
   width = 200;
   height = 150;
@@ -166,7 +167,7 @@ export default class RoomPage extends Vue {
   snackbarColor = '#40826d';
   snackbarText = 'Your nickname has been updated';
 
-  focusedName = null;
+  focusedName = '';
   focusedId = null;
   focusedUser = null;
   
@@ -215,11 +216,19 @@ export default class RoomPage extends Vue {
     this.pageLoading = false;
   }
 
-  cameraClick() {
+  async cameraClick() {
     if (this.dcs.length === 0) return;
-    this.cameraOn = !this.cameraOn;
+    if(this.dataSource === 'screenCast') {
+      this.stream.getVideoTracks()[0].stop();
+      await this.switchDataSource();
+      this.cameraOn = true;
+      this.showVideo = true;
+      this.screenSharing = false;
+    } else {
+      this.cameraOn = !this.cameraOn;
+      this.showVideo = !this.showVideo;
+    }
     this.captureMedia();
-    this.showVideo = !this.showVideo;
   }
 
   micClick() {
@@ -228,16 +237,47 @@ export default class RoomPage extends Vue {
     this.captureMedia();
   }
 
-  changeDataSource(source) {
-    this.stream = source
+  async screenSharingClick() {
+    if (this.dcs.length === 0) return;
+    if(this.dataSource !== 'screenCast') {
+      await this.switchDataSource();
+      this.screenSharing = true;
+      this.cameraOn = true;
+      this.showVideo = true;
+    } else if (this.cameraOn) {
+      this.stream.getVideoTracks()[0].stop();
+      this.screenSharing = false;
+      this.cameraOn = false;
+      this.showVideo = false;
+    } else if (!this.cameraOn) {
+      await this.changeDataSource(await dataSources[this.dataSource]());
+      this.screenSharing = true;
+      this.cameraOn = true;
+      this.showVideo = true;
+    }
+    this.captureMedia();
+  }
+
+  async changeDataSource(source) {
+    const audioTrack = this.stream.getAudioTracks()[0];
+    this.stream = source;
+    if (this.dataSource === 'screenCast') {
+      this.stream.getVideoTracks()[0].onended = async () => {
+        this.screenSharing = false;
+        this.cameraOn = false;
+        this.showVideo = false;
+        this.captureMedia();
+      };
+    };
     for (const peer of Object.values(this.peers)) {
       this.stream.getTracks().forEach(track => {
+        peer.addTrack(track, this.stream);
         const sender = peer.getSenders()
           .find((s) => s.track.kind == track.kind);
         sender.replaceTrack(track);
       })
     }
-
+    this.stream.addTrack(audioTrack);
     document.getElementById('video1').srcObject = this.stream;
   }
 
@@ -251,7 +291,6 @@ export default class RoomPage extends Vue {
   }
 
   async switchDataSource() {
-    console.log(this.dataSource === 'webCamera' ? 'screenCast' : 'webCamera');
     this.dataSource = this.dataSource === 'webCamera' ? 'screenCast' : 'webCamera';
     await this.changeDataSource(await dataSources[this.dataSource]())
   }
@@ -265,8 +304,9 @@ export default class RoomPage extends Vue {
 
   leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
+    this.socket.emit(EVENTS.LEAVE, { roomId: this.roomId });
     this.socket.disconnect();
-    this.$router.push({path: '/'})
+    window.location.replace('http://localhost:3000/')
   }
 
   onNicknameUpdated() {
