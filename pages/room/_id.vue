@@ -221,7 +221,8 @@ export default class RoomPage extends Vue {
     if (this.dcs.length === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
-      await this.switchDataSource();
+      const ans = await this.switchDataSource();
+      if (!ans) return;
       this.cameraOn = true;
       this.showVideo = true;
       this.screenSharing = false;
@@ -241,7 +242,8 @@ export default class RoomPage extends Vue {
   async screenSharingClick() {
     if (this.dcs.length === 0) return;
     if(this.dataSource !== 'screenCast') {
-      await this.switchDataSource();
+      const ans = await this.switchDataSource();
+      if (!ans) return;
       this.screenSharing = true;
       this.cameraOn = true;
       this.showVideo = true;
@@ -251,7 +253,13 @@ export default class RoomPage extends Vue {
       this.cameraOn = false;
       this.showVideo = false;
     } else if (!this.cameraOn) {
-      await this.changeDataSource(await dataSources[this.dataSource]());
+      try {
+        await dataSources[this.dataSource]();
+        await this.changeDataSource(ans);
+      } catch (err) {
+        console.log(err);
+        return;
+      }
       this.screenSharing = true;
       this.cameraOn = true;
       this.showVideo = true;
@@ -293,7 +301,15 @@ export default class RoomPage extends Vue {
 
   async switchDataSource() {
     this.dataSource = this.dataSource === 'webCamera' ? 'screenCast' : 'webCamera';
-    await this.changeDataSource(await dataSources[this.dataSource]())
+    let ans = null;
+    try {
+      ans = await dataSources[this.dataSource]();
+      await this.changeDataSource(ans);
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
   }
 
   copyLink() {
