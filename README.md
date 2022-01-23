@@ -7,7 +7,7 @@ Tech stack: fastify, socket.io and Nuxt.js for ui.
 
 ## Usage 
 When you are at the home page, there are two options. The upper button is responsible for creating the room for meeting. For this you have to enter your nickname which will be shown to the other users. The first user to join the conference is automatically assigned as an owner.
-After creating the room, platform generates a unique link (you can copy this link by clicking the appropriate button at the downpage). This link may be shared with other users to join them to the current room. The platform supports audio, video and screen sharing. 
+After creating the room, platform generates a unique link (you can copy this link by clicking the appropriate button at the downpage). This link may be shared with other users to join them at the current room. The platform supports audio, video and screen sharing. 
 
 As a member you are able to:
 - turn on/off these options by clicking a corresponding buttons
