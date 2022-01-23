@@ -119,6 +119,7 @@ import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
 import dataSources from '../../helpers/dataSources'
+import events from '../../helpers/events'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -155,13 +156,13 @@ export default class RoomPage extends Vue {
 
   @SettingsModalMutation updateSettingsModal
 
-  image="https://picsum.photos/200/150?blur";
+  image="https://picsum.photos/320/180?blur";
   cameraOn = false;
   showVideo = false;
   screenSharing = false;
   micOn = false;
-  width = 200;
-  height = 150;
+  width = 320;
+  height = 180;
   stream = null;
   pageLoading = true;
   admin = false;
@@ -199,16 +200,6 @@ export default class RoomPage extends Vue {
   async mounted() {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
-    // window.onbeforeunload = () => {
-    //   this.dcs.forEach(dc => dc.close());
-    //   Object.values(this.peers).forEach(peer => peer.close())
-    //   this.socket.close();
-    //   return true;
-    // }
-    // this.socket.onconnect = () => {
-    //   console.log()
-    //   this.peerId = this.socket.id
-    // }
     this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
@@ -314,9 +305,12 @@ export default class RoomPage extends Vue {
     this.socket.emit(EVENTS.LEAVE, { roomId: this.roomId });
   }
 
-  leaveRoom() {
+  async leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
-    this.socket.emit(EVENTS.LEAVE, { roomId: this.roomId });
+    this.socket.emit(events.LEAVE, { roomId: this.roomId });
+    await this.awaitResponse(events.REMOVE_PEER, Object.values(this.peers).length)
+    this.dcs.forEach(dc => dc.close())
+    console.log('all dc close');
     this.socket.disconnect();
     window.location.replace('http://localhost:3000/')
   }
@@ -352,6 +346,20 @@ export default class RoomPage extends Vue {
     this.focusedId = null;
     this.focusedName = null;
     this.focusedUser = null;
+  }
+
+  awaitResponse(type, n) {
+    if (n === 0) return
+    return new Promise((resolve) => {
+      let received = 0;
+      this.socket.on(type, () => {
+        received++;
+        if (n === received) {
+          console.log('all events received');
+          resolve()
+        }
+      })
+    })
   }
 }
 </script>

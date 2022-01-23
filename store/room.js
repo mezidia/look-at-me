@@ -9,7 +9,6 @@ export const state = () => ({
 export const mutations = {
   addUser (state, { peerId, stream }) {
     Vue.set(state.users, peerId, { peerId, stream, cameraOn: false, micOn: false, name: 'User', isAdmin: false })
-    console.log('users', state.users)
   },
   setRoomId (state, roomId) {
     state.roomId = roomId
@@ -22,7 +21,6 @@ export const mutations = {
     Vue.set(state.users[peerId], 'micOn', devices.micOn)
   },
   updateNameStatus (state, { clientId, nickName, isAdmin }) {
-    console.log(nickName, isAdmin)
     Vue.set(state.users[clientId], 'name', nickName)
     Vue.set(state.users[clientId], 'isAdmin', isAdmin)
   }

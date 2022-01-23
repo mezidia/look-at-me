@@ -54,7 +54,6 @@ export default class IndexPage extends Vue {
   }
 
   onCreateRoomClick() {
-    console.log('createRoom');
     const roomId = uuidv4();
     this.setRoomId(roomId);
     this.updateClicked(true);

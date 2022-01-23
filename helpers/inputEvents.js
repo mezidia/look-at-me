@@ -17,6 +17,11 @@ export const inputEvents = {
         this.updateDevicesStatus({ peerId, devices: data });
       }
     }
+    this.peers[peerId].oniceconnectionstatechange = () => {
+      if(this.peers[peerId].iceConnectionState === 'disconnected') {
+          console.log('Disconnected');
+      }
+    }
     const dc = await this.peers[peerId].createDataChannel('devicesStatus');
     this.dcs.push(dc);
     dc.onopen = () => {
@@ -36,14 +41,12 @@ export const inputEvents = {
       tracksNumber++;
       this.addUser({ peerId, remoteStream });
       const peerVideo = document.getElementById('video' + peerId);
-      console.log(tracksNumber, remoteStream, peerVideo)
       if (tracksNumber === 2 || tracksNumber === 1) {
         tracksNumber = 0
         if (this.clients.includes(peerId)) return;
         let settled = false;
         const interval = setInterval(() => {
           if (peerVideo) {
-            console.log('stream set');
             peerVideo.srcObject = remoteStream;
             peerVideo.play()
             settled = true;
@@ -85,9 +88,8 @@ export const inputEvents = {
     );
   },
   [EVENTS.REMOVE_PEER]: async function ({ peerId }) {
-    console.log('leave', peerId)
+    console.log('REMOVE_PEER', peerId)
     this.deleteUser(peerId);
-    console.log(this.users)
 
     if (this.peers[peerId]) {
       this.peers[peerId].close();

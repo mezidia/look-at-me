@@ -5,7 +5,6 @@ export const state = () => ({
 
 export const mutations = {
   updateClicked (state, clicked) {
-    console.log('MUTATION')
     state.clicked = clicked
   },
 
