@@ -4,6 +4,7 @@
     v-model="nicknameModal"
     @keydown.enter="onSubmitClick"
     persistent
+    :overlay-opacity="0.95"
   >
     <v-card>
       <v-card-text>
