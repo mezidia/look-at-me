@@ -61,9 +61,6 @@ export default class IndexPage extends Vue {
     this.$router.replace({ path: '/room/' + roomId });
   }
 
-  onFindRoomClick() {
-    console.log('findRoom');
-  }
 }
 </script>
 
