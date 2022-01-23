@@ -17,7 +17,16 @@
             class="hover-pointer"
             @dblclick="unselectUser()"
           >
-            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo" :pageLoading="pageLoading" :image="image" :micClicked="focusedUser ? focusedUser.micOn : micOn" :width="720" :height="405"/>
+            <UserBlock
+              :id="'focusedId'"
+              :name="focusedName"
+              :cameraOn="focusedUser ? focusedUser.cameraOn : showVideo"
+              :pageLoading="pageLoading"
+              :image="image"
+              :micClicked="focusedUser ? focusedUser.micOn : micOn"
+              :width="720"
+              :height="405"
+            />
           </div>
         </v-row>
         <v-row id="users-panel" class="fill-height" justify="center">
@@ -63,9 +72,30 @@
         </v-row>
       </v-container>
       <v-row class="play-icon-row">
-        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-microphone" :onClick="micClick" :clicked="micOn"/>
-        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo && !screenSharing"/>
-        <OnOffIcon :disabled="!mediaAvailable" class="mx-3" big iconName="mdi-monitor-screenshot" :onClick="screenSharingClick" :clicked="screenSharing"/>
+        <OnOffIcon
+          :disabled="!mediaAvailable"
+          class="mx-3"
+          big
+          iconName="mdi-microphone"
+          :onClick="micClick"
+          :clicked="micOn"
+        />
+        <OnOffIcon
+          :disabled="!mediaAvailable"
+          class="mx-3"
+          big
+          iconName="mdi-video"
+          :onClick="cameraClick"
+          :clicked="showVideo && !screenSharing"
+        />
+        <OnOffIcon
+          :disabled="!mediaAvailable"
+          class="mx-3"
+          big
+          iconName="mdi-monitor-screenshot"
+          :onClick="screenSharingClick"
+          :clicked="screenSharing"
+        />
         <v-tooltip top>
           <template v-slot:activator="{ on, attrs }">
             <v-icon 
@@ -325,13 +355,11 @@ export default class RoomPage extends Vue {
 
   async leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
-    console.log('socket id from client than leave:', this.socket.id);
     this.socket.emit(events.LEAVE, { roomId: this.roomId });
     await this.awaitResponse(events.REMOVE_PEER, Object.values(this.peers).length)
-    this.dcs.forEach(dc => dc.close())
-    console.log('all dc close');
+    this.dcs.forEach(dc => dc.close());
     this.socket.disconnect();
-    window.location.replace('http://localhost:3000/')
+    window.location.replace('http://localhost:3000/');
   }
 
   onNicknameUpdated() {
@@ -373,7 +401,6 @@ export default class RoomPage extends Vue {
       this.socket.on(type, () => {
         received++;
         if (n === received) {
-          console.log('all events received');
           resolve()
         }
       })
