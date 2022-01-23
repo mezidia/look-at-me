@@ -8,9 +8,8 @@ export const state = () => ({
 
 export const mutations = {
   addUser (state, { peerId, stream }) {
-    console.log('addUser', state.users)
     if (!state.users[peerId]) {
-      Vue.set(state.users, peerId, { peerId, stream, cameraOn: false, micOn: false, name: 'User', isAdmin: false })
+      Vue.set(state.users, peerId, { peerId, stream, cameraOn: false, micOn: false, name: 'названий пельмень', isAdmin: false })
     } else {
       Vue.set(state.users[peerId], 'peerId', peerId)
       Vue.set(state.users[peerId], 'stream', stream)
@@ -27,11 +26,10 @@ export const mutations = {
     Vue.set(state.users[peerId], 'micOn', devices.micOn)
   },
   updateNameStatus (state, { clientId, nickName, isAdmin }) {
-    console.log('updateNameStatus', state.users)
     if (!state.users[clientId]) {
       Vue.set(state.users, clientId, { peerId: clientId, stream: null, cameraOn: false, micOn: false, name: nickName, isAdmin })
     } else {
-      Vue.set(state.users[clientId], 'name', nickName || 'я працюю')
+      Vue.set(state.users[clientId], 'name', nickName || 'неназваний пельмень')
       Vue.set(state.users[clientId], 'isAdmin', isAdmin)
     }
   }

@@ -12,8 +12,8 @@
         </v-row>
         <v-row justify="center">
           <BasicButton 
-          text="Find Room"
-          :onClick="onFindRoomClick"/>
+          text="Our Emotions"
+          :onClick="onOurEmotionsClick"/>
         </v-row>
         
       </v-col>
@@ -61,8 +61,8 @@ export default class IndexPage extends Vue {
     this.$router.replace({ path: '/room/' + roomId });
   }
 
-  onFindRoomClick() {
-    console.log('findRoom');
+  onOurEmotionsClick() {
+    window.location.replace('https://www.meme-arsenal.com/memes/575ce4e347f08e123aaac0a212ca749c.jpg');
   }
 }
 </script>

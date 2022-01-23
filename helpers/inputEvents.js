@@ -110,5 +110,6 @@ export const inputEvents = {
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
     console.log('ACCEPT_USER_INFO me:', this.socket.id, { clientId, nickName, isAdmin });
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
+    else if (isAdmin) this.admin = true;
   }
 }
