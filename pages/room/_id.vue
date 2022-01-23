@@ -309,6 +309,7 @@ export default class RoomPage extends Vue {
 
   async leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
+    console.log('socket id from client than leave:', this.socket.id);
     this.socket.emit(events.LEAVE, { roomId: this.roomId });
     await this.awaitResponse(events.REMOVE_PEER, Object.values(this.peers).length)
     this.dcs.forEach(dc => dc.close())
