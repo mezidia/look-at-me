@@ -80,7 +80,6 @@
         class="settings-button"
       />
     </div>
-    {{ nickname }}
     <NotificationSnackbar
       :text="snackbarText"
       :snackbar="snackbar"
@@ -272,15 +271,9 @@ export default class RoomPage extends Vue {
     const selectedSlot = document.getElementById('videofocusedId');
     const selectedId = 'video' + peerId;
     const video = document.getElementById(selectedId);
-    console.log('video, selectedSlot:');
-    console.log(video, selectedSlot);
-    console.log(video.srcObject);
     const stream = video.srcObject;
-    video.srcObject = null;
-    video.srcObject = stream;
     selectedSlot.srcObject = stream;
     selectedSlot.style.visibility = 'visible';
-    console.log(selectedSlot.srcObject);
   }
 
   unselectUser() {
