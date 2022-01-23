@@ -86,6 +86,12 @@ This directory contains your Vuex store files. Creating a file in this directory
 
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
 
+## Docker
+There is a docker-compose.yml file. It can be used to run application locally. For that you have to download [docker-compose.yml](https://github.com/mezidia/look-at-me-api/blob/main/docker-compose.yml). In file's directory run command:
+``` 
+$ docker-compose up -d
+```
+After that, the app will be running on port 3000, so the platform will be available at http://localhost:3000/
 
 ## Team members
 [la7rodectus](https://github.com/La7rodectus).
