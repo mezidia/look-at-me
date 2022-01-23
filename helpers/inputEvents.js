@@ -8,26 +8,30 @@ export const inputEvents = {
       return;
     }
 
-    this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
-    this.peers[peerId].ondatachannel = e => {
-      e.channel.onopen = () => {};
-      e.channel.onmessage = (e) => {
-        console.log(e.data);
+    const channelHandlers = {
+      devicesStatus: (e) => {
+        console.log('devicesStatus', e.data);
         const data = JSON.parse(e.data);
         this.updateDevicesStatus({ peerId, devices: data });
-      }
-    }
-    this.peers[peerId].oniceconnectionstatechange = () => {
-      if(this.peers[peerId].iceConnectionState === 'disconnected') {
-          console.log('Disconnected');
-      }
-    }
-    const dc = await this.peers[peerId].createDataChannel('devicesStatus');
-    this.dcs.push(dc);
-    dc.onopen = () => {
-      dc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled }));
+      },
+      kik: async (e) => {
+        console.log('kik', e.data);
+        await this.leaveRoom();
+      },
     }
 
+    this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
+    this.peers[peerId].ondatachannel = e => {
+      e.channel.onmessage = channelHandlers[e.channel.label]
+    }
+
+    const devicesStatusDc = await this.peers[peerId].createDataChannel('devicesStatus');
+    const kikDc = await this.peers[peerId].createDataChannel('kik');
+    this.dcs.push(devicesStatusDc);
+    this.kikDcs[peerId] = kikDc;
+    devicesStatusDc.onopen = () => {
+      devicesStatusDc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled }));
+    }
 
 
 
@@ -104,7 +108,7 @@ export const inputEvents = {
     else console.log('Error! ' + msg);
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
-    else if (isAdmin) this.admin = isAdmin;
+    console.log('ACCEPT_USER_INFO', { clientId, nickName, isAdmin });
+    if (this.socket.id === clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
   }
 }

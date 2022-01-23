@@ -52,7 +52,7 @@
               :name="user.name"
               :pageLoading="pageLoading"
               :image="image"
-              :admin="admin"
+              :admin="isNewRoom"
               @removePersonFromRoom="removePersonFromRoom"
               :cameraOn="user.cameraOn"
               :micClicked="user.micOn"
@@ -176,12 +176,14 @@ export default class RoomPage extends Vue {
   focusedId = null;
   focusedUser = null;
   
+  isNewRoom = false;
   socket = null;
   peers = {};
   clients = [];
   rooms = [];
   peerId = '1';
   dcs = [];
+  kikDcs = {};
   dataSource = 'webCamera';
 
   get mediaAvailable () {
@@ -301,8 +303,8 @@ export default class RoomPage extends Vue {
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
   }
 
-  removePersonFromRoom() {
-    this.socket.emit(EVENTS.LEAVE, { roomId: this.roomId });
+  removePersonFromRoom(kikId) {
+    this.kikDcs[kikId].send(JSON.stringify({ status: 'go away' }))
   }
 
   async leaveRoom() {

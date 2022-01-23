@@ -38,7 +38,7 @@ export default class UserBlock extends Vue {
 
   @Emit('removePersonFromRoom')
   removePersonFromRoom() {
-    return id;
+    return this.id;
   }
 }
 </script>
