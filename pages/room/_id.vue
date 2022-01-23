@@ -52,6 +52,8 @@
               :name="user.name"
               :pageLoading="pageLoading"
               :image="image"
+              :admin="admin"
+              @removePersonFromRoom="removePersonFromRoom"
               :cameraOn="user.cameraOn"
               :micClicked="user.micOn"
               :width="width"
@@ -161,6 +163,7 @@ export default class RoomPage extends Vue {
   height = 150;
   stream = null;
   pageLoading = true;
+  admin = false;
 
   snackbar = false;
   snackbarTimeout = 3000;
@@ -300,6 +303,10 @@ export default class RoomPage extends Vue {
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
+  }
+
+  removePersonFromRoom() {
+    this.socket.emit(EVENTS.LEAVE, { roomId: this.roomId });
   }
 
   leaveRoom() {

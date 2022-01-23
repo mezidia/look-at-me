@@ -98,9 +98,11 @@ export const inputEvents = {
     this.socket.rooms = rooms
   },
   [EVENTS.ERROR]: async function ({ msg }) {
-    this.$router.push({path: '/error'})
+    if (msg === '404') this.$router.push({path: '/error'})
+    else console.log('Error! ' + msg);
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
+    else if (isAdmin) this.admin = isAdmin;
   }
 }
