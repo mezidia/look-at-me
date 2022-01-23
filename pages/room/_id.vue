@@ -11,12 +11,41 @@
     
     <div :style="{'visibility': pageLoading ? 'hidden' : 'visible'}">
       
-      <v-row justify="start" align="start">
-        <v-row id="users-panel" class="fill-height" justify="center">
-          <UserBlock :id="peerId" muted name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
-          <UserBlock :id="user.peerId" v-for="user in users" :key="user.peerId" :name="user.name" :pageLoading="pageLoading" :image="image" :cameraOn="user.cameraOn" :micClicked="user.micOn" :width="width" :height="height"/>
+      <v-container justify="start" align="start">
+        <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
+          <div
+            @click="unselectUser()"
+          >
+            <UserBlock :id="'focusedId'" :name="focusedName" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="600" :height="450"/>
+          </div>
         </v-row>
-      </v-row>
+        <v-row id="users-panel" class="fill-height" justify="center">
+          <div
+            @click="selectUser(peerId, 'You')"
+            v-show="focusedId !== peerId"
+          >
+            <UserBlock
+              :id="peerId" muted name="You" :cameraOn="showVideo" :pageLoading="pageLoading" :image="image" :micClicked="micOn" :width="width" :height="height"/>
+          </div>
+          <div
+            @click="selectUser(user.peerId, user.name)"
+            v-for="user in users"
+            :key="user.peerId"
+            :id="user.peerId"
+            :name="user.name"
+          >
+            <UserBlock
+              v-show="user.peerId !== focusedId"
+              :id="user.peerId"
+              :name="user.name"
+              :pageLoading="pageLoading"
+              :image="image" :cameraOn="user.cameraOn"
+              :micClicked="user.micOn" :width="width"
+              :height="height"
+            />
+          </div>
+        </v-row>
+      </v-container>
       <v-row class="play-icon-row">
         <OnOffIcon class="mx-3" big iconName="mdi-microphone" :onClick="micClick" :clicked="micOn"/>
         <OnOffIcon class="mx-3" big iconName="mdi-video" :onClick="cameraClick" :clicked="showVideo && !screenSharing"/>
@@ -125,6 +154,9 @@ export default class RoomPage extends Vue {
   snackbarColor = '#40826d';
   snackbarText = 'Your nickname has been updated';
 
+  focusedName = null;
+  focusedId = null;
+  
   socket = null;
   peers = {};
   clients = [];
@@ -264,6 +296,29 @@ export default class RoomPage extends Vue {
   setNotification() {
     this.snackbar = true;
     setTimeout(() => this.snackbar = false, this.snackbarTimeout);
+  }
+
+  selectUser(peerId, userName) {
+    this.focusedId = peerId;
+    this.focusedName = userName;
+    
+    const selectedSlot = document.getElementById('videofocusedId');
+    const selectedId = 'video' + peerId;
+    const video = document.getElementById(selectedId);
+    console.log('video, selectedSlot:');
+    console.log(video, selectedSlot);
+    console.log(video.srcObject);
+    const stream = video.srcObject;
+    video.srcObject = null;
+    video.srcObject = stream;
+    selectedSlot.srcObject = stream;
+    selectedSlot.style.visibility = 'visible';
+    console.log(selectedSlot.srcObject);
+  }
+
+  unselectUser() {
+    this.focusedId = null;
+    this.focusedName = null;
   }
 }
 </script>
