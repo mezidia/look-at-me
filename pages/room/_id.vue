@@ -354,7 +354,6 @@ export default class RoomPage extends Vue {
     const video = document.getElementById(selectedId);
     const stream = video.srcObject;
     selectedSlot.srcObject = stream;
-    selectedSlot.style.visibility = 'visible';
 
     if (user) {
       this.focusedUser = user;
