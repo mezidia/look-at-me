@@ -185,7 +185,7 @@ export default class RoomPage extends Vue {
   }
 
   copyLink() {
-    window.navigator.clipboard.writeText(window.location.href);
+    window.navigator.clipboard.writeText($nuxt.$route.fullPath);
     const copyLinkTooltip = document.getElementById('copy-link-tooltip');
     copyLinkTooltip.innerText = 'Copied!';
     setTimeout(() => copyLinkTooltip.innerText = 'Copy Link', 2000);
@@ -194,7 +194,7 @@ export default class RoomPage extends Vue {
   leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
     this.socket.disconnect();
-    window.location.replace('http://localhost:3000/');
+    this.$router.push({path: '/'})
   }
 
   onNicknameUpdated() {

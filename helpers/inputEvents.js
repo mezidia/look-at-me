@@ -91,7 +91,7 @@ export const inputEvents = {
     this.socket.rooms = rooms
   },
   [EVENTS.ERROR]: async function ({ msg }) {
-    console.log(msg);
+    this.$router.push({path: '/error'})
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
     console.log(this.socket.id, clientId, nickName, isAdmin)
