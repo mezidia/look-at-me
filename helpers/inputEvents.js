@@ -1,7 +1,5 @@
 import freeice from 'freeice'
 import EVENTS from './events'
-import onDataChannelMessage from './dataChannels';
-import msgTypes from './dataChannels/msgTypes';
 
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
@@ -11,24 +9,23 @@ export const inputEvents = {
     }
 
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
-
-
-
     this.peers[peerId].ondatachannel = e => {
       e.channel.onopen = () => {};
-      e.channel.onmessage = onDataChannelMessage.bind(this)
-    } 
+      e.channel.onmessage = (e) => {
+        console.log(e.data);
+        const data = JSON.parse(e.data);
+        // if (data.updateStreamFrom) {
+        //   document.getElementById('video' + updateStreamFrom).srcObject = 
+        //   return;
+        // }
+        this.updateDevicesStatus({ peerId, devices: data });
+      }
+    }
     const dc = await this.peers[peerId].createDataChannel('devicesStatus');
     this.dcs.push(dc);
     dc.onopen = () => {
-      console.log('channel opened');
-      console.log('is camera on', this.stream.getVideoTracks()[0].enabled);
-      dc.send(JSON.stringify({
-        type: msgTypes.DEVICES_STATUS,
-        args: {peerId, cameraOn: this.stream.getVideoTracks()[0].enabled}
-      }));
+      dc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled}));
     } //, micOn: this.stream.getAudioTracks()[0].enabled}
-
 
 
 

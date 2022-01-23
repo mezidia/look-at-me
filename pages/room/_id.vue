@@ -110,16 +110,6 @@ export default class RoomPage extends Vue {
     this.setDefaultStreamSettings(this.stream)
     video.srcObject = this.stream;
     this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
-
-    // await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true })
-    // .then(stream => {
-    //   this.stream = stream;
-    //   video.srcObject = stream;
-    //   this.stream.getVideoTracks()[0].enabled = false;
-    //   if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
-    //   this.socket.emit(EVENTS.JOIN, { roomId, isNewRoom: this.isNewRoom });
-    // })
-   
     this.pageLoading = false;
   }
 
@@ -136,13 +126,16 @@ export default class RoomPage extends Vue {
     this.captureMedia();
   }
 
-  async changeDataSource(source) {
+  changeDataSource(source) {
     this.stream = source
     for (const peer of Object.values(this.peers)) {
       this.stream.getTracks().forEach(track => {
-        peer.addTrack(track, this.stream);
+        const sender = peer.getSenders()
+          .find((s) => s.track.kind == track.kind);
+        sender.replaceTrack(track);
       })
     }
+
     document.getElementById('video1').srcObject = this.stream;
   }
 
