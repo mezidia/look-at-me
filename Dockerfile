@@ -9,7 +9,7 @@ WORKDIR /usr/src/nuxt-app
 RUN apk update && apk upgrade
 RUN apk add git
 
-# copy the app, note .dockerignore
+# copy the app
 COPY . /usr/src/nuxt-app/
 RUN npm install
 
@@ -17,13 +17,8 @@ RUN npm install
 # since it builds the server as well
 RUN npm run build
 
-# expose 5000 on container
+# expose 3000 on container
 EXPOSE 3000
-
-# set app serving to permissive / assigned
-# ENV NUXT_HOST=0.0.0.0
-# set app port
-# ENV NUXT_PORT=5000
 
 # start the app
 CMD [ "npm", "start" ]
