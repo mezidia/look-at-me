@@ -4,6 +4,7 @@
     width="400px"
     @click:outside="updateSettingsModal(false)"
     @keydown.esc="updateSettingsModal(false)"
+    @keydown.enter="onConfirm"
   >
     <v-card>
       <v-card-title>
@@ -33,7 +34,7 @@
         <v-btn
           @click="updateSettingsModal(false)"
         >
-          Cansel
+          Cancel
         </v-btn>
         <v-btn
           @click="onConfirm"
