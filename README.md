@@ -84,7 +84,7 @@ More information about the usage of this directory in [the documentation](https:
 
 
 ## Team members
-[la7rodectus](https://github.com/La7rodectus).
-[lizardynx](https://github.com/lizardlynx).
-[tr1ckste](https://github.com/tr1ckste).
-[zavad4](https://github.com/zavad4).
+* [la7rodectus](https://github.com/La7rodectus).
+* [lizardynx](https://github.com/lizardlynx).
+* [tr1ckste](https://github.com/tr1ckste).
+* [zavad4](https://github.com/zavad4).
