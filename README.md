@@ -1,5 +1,19 @@
 # look-at-me
 
+## About application
+Look-at-me is platform for meetings that use WebRTC standard.
+Look-at-me-api is located in this [repository](https://github.com/mezidia/look-at-me-api).
+Tech stack: fastify, socket.io and Nuxt.js for ui.
+
+## Usage 
+You can create room  or join for existing one. User that created the room, automatically become an owner and can: 
+- copy and share unique link for this room
+- remove another users from room.
+
+To join for existing room, you must receive unique link from room owner.
+
+In room you can share your voice, video and even screen by clicking on the appropriate buttons. Also you can leave room at any moment.
+
 ## Build Setup
 
 ```bash
@@ -67,3 +81,10 @@ More information about the usage of this directory in [the documentation](https:
 This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
 
 More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+
+
+## Team members
+* [la7rodectus](https://github.com/La7rodectus).
+* [lizardynx](https://github.com/lizardlynx).
+* [tr1ckste](https://github.com/tr1ckste).
+* [zavad4](https://github.com/zavad4).
