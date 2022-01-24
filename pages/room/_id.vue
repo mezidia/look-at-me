@@ -236,13 +236,15 @@ export default class RoomPage extends Vue {
   async mounted() {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
-    this.socket.on('connect', () => this.setSocketId(this.socket.id))
+    this.socket.on('connect', () => {
+      window.onbeforeunload = () => localStorage.removeItem('myNickname' + this.socket.id)
+      this.setSocketId(this.socket.id)
+    })
     this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
       this.socket.on(eventName, inputEvents[eventName].bind(this));
     }
-
     const video = document.getElementById('video1');
     this.stream = await dataSources[this.dataSource]() // opts = { video: true, audio: true } : default
       .catch(err => console.log('An error occurred: ' + err));
@@ -369,6 +371,7 @@ export default class RoomPage extends Vue {
 
   async leaveRoom() {
     this.stream.getTracks().forEach(track => track.stop());
+    localStorage.removeItem('myNickname' + this.socket.id)
     this.socket.emit(events.LEAVE, { roomId: this.roomId });
     await this.awaitResponse(events.REMOVE_PEER, Object.values(this.peers).length)
     this.dcs.forEach(dc => dc.close());
