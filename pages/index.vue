@@ -62,7 +62,7 @@ export default class IndexPage extends Vue {
   }
 
   onOurEmotionsClick() {
-    window.location.replace('https://www.meme-arsenal.com/memes/575ce4e347f08e123aaac0a212ca749c.jpg');
+    window.location.href = 'https://www.meme-arsenal.com/memes/575ce4e347f08e123aaac0a212ca749c.jpg'
   }
 }
 </script>
