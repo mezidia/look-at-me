@@ -20,6 +20,7 @@
           placeholder="Type here"
           v-model="inputNickname"
           @input="showFormError = false"
+          size="30"
         >
         <p
           v-show="showFormError"
