@@ -15,7 +15,7 @@
         <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
           <div
             class="hover-pointer"
-            @dblclick="unselectUser()"
+            @dblclick="unselectUser(focusedId)"
           >
             <UserBlock
               :id="'focusedId'"
@@ -26,6 +26,9 @@
               :micClicked="focusedUser ? focusedUser.micOn : micOn"
               :width="720"
               :height="405"
+              :userMutedStatus="focusedMuted"
+              @userMuted="muteUser(focusedId)"
+              @userUnmuted="unmuteUser(focusedId)"
             />
           </div>
         </v-row>
@@ -208,6 +211,9 @@ export default class RoomPage extends Vue {
   focusedName = '';
   focusedId = null;
   focusedUser = null;
+  focusedMuted = 'hi';
+
+  mutedInSelectedStatus = 'Mute';
   
   isNewRoom = false;
   socket = null;
@@ -384,9 +390,16 @@ export default class RoomPage extends Vue {
   }
 
   selectUser(peerId, userName, user) {
-    this.unselectUser();
+    if (this.selectedId) {
+      this.unselectUser();
+    }
     this.focusedId = peerId;
     this.focusedName = userName;
+
+    const mutedStatus = document.getElementById('muted' + peerId).innerText.trim();
+    console.log('THIS MUTED STATUS', mutedStatus)
+
+    this.focusedMuted = mutedStatus;
     
     const selectedSlot = document.getElementById('videofocusedId');
     const selectedId = 'video' + peerId;
@@ -403,14 +416,15 @@ export default class RoomPage extends Vue {
     this.focusedId = null;
     this.focusedName = '';
     this.focusedUser = null;
+    this.focusedMuted = '';
   }
 
   muteUser(peerId) {
     const videoId = 'video' + peerId;
     const video = document.getElementById(videoId);
     const stream = video.srcObject;
-    console.log(stream.getAudioTracks());
     stream.getAudioTracks()[0].enabled = false;
+    this.mutedInSelectedStatus = 'Unmute';
   }
 
   unmuteUser(peerId) {
@@ -418,6 +432,7 @@ export default class RoomPage extends Vue {
     const video = document.getElementById(videoId);
     const stream = video.srcObject;
     stream.getAudioTracks()[0].enabled = true;
+    this.mutedInSelectedStatus = 'Mute';
   }
 
   awaitResponse(type, n) {

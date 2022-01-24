@@ -13,6 +13,7 @@
       <OnOffIcon v-show="admin" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
     </v-row>
     <div
+      :id="'muted' + id"
       v-show="id !== '1'"
       class="mute-button"
       @click.stop="changeMutedStatus"
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-import { Prop, Vue } from 'nuxt-property-decorator'
+import { Prop, Vue, Watch } from 'nuxt-property-decorator'
 import Component from 'nuxt-class-component'
 import OnOffIcon from '../components/OnOffIcon.vue'
 import { Emit } from 'vue-property-decorator'
@@ -44,8 +45,15 @@ export default class UserBlock extends Vue {
   @Prop({type: Boolean, required: false, default: false}) muted;
   @Prop({type: Boolean, required: false, default: false}) pageLoading;
   @Prop({type: Boolean, required: false, default: false}) admin;
+  @Prop({type: String, required: false }) userMutedStatus;
 
   mutedStatus = 'Mute';
+
+  @Watch('userMutedStatus')
+  setMutedStatus() {
+    this.mutedStatus = this.userMutedStatus;
+    console.log('updated Uset Muted status', this.mutedStatus)
+  }
 
   @Emit('removePersonFromRoom')
   removePersonFromRoom() {
@@ -54,6 +62,8 @@ export default class UserBlock extends Vue {
 
 
   changeMutedStatus() {
+    console.log('lol');
+    console.log(this.mutedStatus)
     if (this.mutedStatus === 'Mute') {
       this.muteUser()
       return;
@@ -63,6 +73,7 @@ export default class UserBlock extends Vue {
 
   @Emit('userMuted')
   muteUser() {
+    console.log('muteUser')
     this.mutedStatus = 'Unmute';
   }
 
