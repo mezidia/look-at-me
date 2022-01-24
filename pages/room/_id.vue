@@ -179,7 +179,8 @@ export default class RoomPage extends Vue {
   @Mutation deleteUser;
   @Mutation updateDevicesStatus;
   @Mutation updateNameStatus;
-
+  @Mutation setSocketId;
+  
   @AddRoomState clicked
   @AddRoomState generatedRoomId
 
@@ -235,6 +236,7 @@ export default class RoomPage extends Vue {
   async mounted() {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
+    this.socket.on('connect', () => this.setSocketId(this.socket.id))
     this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
@@ -375,7 +377,7 @@ export default class RoomPage extends Vue {
   }
 
   onNicknameUpdated() {
-    this.updateNickname(window.localStorage.getItem('myNickname'));
+    this.updateNickname(window.localStorage.getItem('myNickname' + this.socket.id));
     this.socket.emit(EVENTS.SHARE_USER_INFO, { roomId: this.roomId, nickName: this.nickname, isAdmin: this.isNewRoom })
   }
 
@@ -434,19 +436,22 @@ export default class RoomPage extends Vue {
     })
   }
 
-  drawMessageInChat(text) {
-    console.log('а я взагаліто нова смсочка в чат =) =>', text);
+  drawMessageInChat(data) {
+    console.log('а я взагаліто нова смсочка в чат від', data.from, ' => ' , data.text);
   }
 
   sendMessageToChat(text) {
-    this.drawMessageInChat('kek')
-    const hardCode = 'kek'
+    const hardCode = 'kek' // rm ME
+
     const evt = {
       type: msgTypes.CHAT,
       data: {
-        text: hardCode
+        from: window.localStorage.getItem('myNickname' + this.socket.id),
+        text: hardCode  // rm ME
       }
     }
+    this.drawMessageInChat(evt.data)
+
     this.dcs.forEach(dc => dc.send(JSON.stringify(evt)))
   }
 

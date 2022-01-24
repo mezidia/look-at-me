@@ -2,7 +2,7 @@ import msgTypes from "./msgTypes"
 
 export default {
   [msgTypes.CHAT]: function(data) {
-    this.drawMessageInChat(data.text)
+    this.drawMessageInChat(data)
   },
   [msgTypes.DEVICE_STATUS]: function(data) {
     this.updateDevicesStatus({ peerId: data.peerId, devices: data });
