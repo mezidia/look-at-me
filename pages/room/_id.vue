@@ -215,7 +215,7 @@ export default class RoomPage extends Vue {
   dcs = new Map();
   dataSource = 'webCamera';
 
-  get mediaAvailable () {
+  get mediaAvailable() {
     return this.dcs.size > 0;
   }
 
@@ -247,6 +247,7 @@ export default class RoomPage extends Vue {
   }
 
   async cameraClick() {
+    console.log('cameraClick', this.dcs, this.dcs.size);
     if (this.dcs.size === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
