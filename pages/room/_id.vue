@@ -129,6 +129,18 @@
         class="settings-button"
       />
     </div>
+    <div class="chat-wrapper">
+      <v-icon id="chat-button" @click="drawer = !drawer">mdi-message</v-icon>
+         <v-navigation-drawer 
+          v-model="drawer" 
+          floating 
+          right
+          width="300" 
+          app id="chat">
+            <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
+         </v-navigation-drawer>
+    </div>
+
     <NotificationSnackbar
       :text="snackbarText"
       :snackbar="snackbar"
@@ -146,6 +158,7 @@ import BasicButton from '../../components/BasicButton.vue'
 import VuetifyIcon from '../../components/VuetifyIcon.vue'
 import SettingsModal from '../../components/SettingsModal.vue'
 import NotificationSnackbar from '../../components/NotificationSnackbar.vue'
+import Message from '../../components/Message.vue'
 
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
@@ -166,7 +179,8 @@ const { Mutation: UserMutation, State: UserState } = namespace('user')
     BasicButton,
     VuetifyIcon,
     SettingsModal,
-    NotificationSnackbar
+    NotificationSnackbar,
+    Message
   }
 })
 
@@ -217,6 +231,9 @@ export default class RoomPage extends Vue {
   dcs = new Map();
   dataSource = 'webCamera';
 
+  drawer = false;
+  messages = [];
+
   get mediaAvailable() {
     return this.dcs.size > 0;
   }
@@ -249,7 +266,6 @@ export default class RoomPage extends Vue {
   }
 
   async cameraClick() {
-    console.log('cameraClick', this.dcs, this.dcs.size);
     if (this.dcs.size === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
@@ -419,6 +435,10 @@ export default class RoomPage extends Vue {
     stream.getAudioTracks()[0].enabled = true;
   }
 
+  sendMessage(name, msg) {
+    this.messages.push({name, msg})
+  }
+
   awaitResponse(type, n) {
     if (n === 0) return
     return new Promise((resolve) => {
@@ -462,8 +482,17 @@ div#room-holder {
 .settings-button {
   position: absolute;
   top: 20px;
-  right: 20px;
+  left: 20px;
 }
+
+.chat-wrapper {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+
 
 .hover-pointer:hover {
   cursor: pointer;
