@@ -42,6 +42,7 @@ import { Component, Vue, namespace } from 'nuxt-property-decorator'
 import BasicButton from './BasicButton.vue'
 
 const { State } = namespace('user')
+const { State: RoomState } = namespace('room')
 const { Mutation: NicknameModalMutation, State: NicknameModalState } = namespace('nicknameModal');
 
 
@@ -51,6 +52,7 @@ export default class AcquaintanceModal extends Vue {
   showFormError = false;
 
   @State nickname
+  @RoomState socketId
 
   @NicknameModalState nicknameModal
   @NicknameModalMutation updateNicknameModal
@@ -60,7 +62,7 @@ export default class AcquaintanceModal extends Vue {
       this.showFormError = true;
       return;
     }
-    window.localStorage.setItem('myNickname', this.inputNickname);
+    window.localStorage.setItem('myNickname' + this.socketId, this.inputNickname);
     this.$emit('userCreated');
     this.updateNicknameModal(false);
   }

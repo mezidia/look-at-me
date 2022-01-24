@@ -3,7 +3,7 @@ import { Vue } from 'nuxt-property-decorator'
 export const state = () => ({
   users: {},
   roomId: null,
-  peerId: null
+  socketId: null
 })
 
 export const mutations = {
@@ -14,6 +14,9 @@ export const mutations = {
       Vue.set(state.users[peerId], 'peerId', peerId)
       Vue.set(state.users[peerId], 'stream', stream)
     }
+  },
+  setSocketId (state, socketId) {
+    state.socketId = socketId
   },
   setRoomId (state, roomId) {
     state.roomId = roomId

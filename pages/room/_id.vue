@@ -112,6 +112,7 @@
         <v-spacer></v-spacer>
         <p v-show="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
+        <BasicButton class="mx-3" text="Push me plz" :onClick="sendMessageToChat" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -165,6 +166,7 @@ import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
 import dataSources from '../../helpers/dataSources'
 import events from '../../helpers/events'
+import msgTypes from '../../helpers/dataChannels/msgTypes'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -191,7 +193,8 @@ export default class RoomPage extends Vue {
   @Mutation deleteUser;
   @Mutation updateDevicesStatus;
   @Mutation updateNameStatus;
-
+  @Mutation setSocketId;
+  
   @AddRoomState clicked
   @AddRoomState generatedRoomId
 
@@ -250,6 +253,7 @@ export default class RoomPage extends Vue {
   async mounted() {
     this.isNewRoom = (this.generatedRoomId === this.roomId) && this.clicked;
     this.socket = socketIo();
+    this.socket.on('connect', () => this.setSocketId(this.socket.id))
     this.updateNicknameModal(true);
     const roomId = this.roomId;
     for (const eventName in inputEvents) {
@@ -345,14 +349,14 @@ export default class RoomPage extends Vue {
     if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
     else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
     const msg = {
-      peerId: this.socket.id,
-      cameraOn: this.stream.getVideoTracks()[0]?.enabled,
-      micOn: this.stream.getAudioTracks()[0]?.enabled 
+      type: msgTypes.DEVICE_STATUS,
+      data: {
+        peerId: this.socket.id,
+        cameraOn: this.stream.getVideoTracks()[0]?.enabled,
+        micOn: this.stream.getAudioTracks()[0]?.enabled 
+      }
     }
-    this.dcs.forEach(dc => { 
-      console.log(dc);
-      dc.send(JSON.stringify(msg))
-    });
+    this.dcs.forEach(dc => dc.send(JSON.stringify(msg)));
   }
 
   async switchDataSource() {
@@ -376,7 +380,7 @@ export default class RoomPage extends Vue {
   }
 
   removePersonFromRoom(kikId) {
-    this.kikDcs[kikId].send(JSON.stringify({ status: 'go away' }))
+    this.dcs.get(kikId).send(JSON.stringify({ type: msgTypes.KICK, data: {} }))
   }
 
   async leaveRoom() {
@@ -389,7 +393,7 @@ export default class RoomPage extends Vue {
   }
 
   onNicknameUpdated() {
-    this.updateNickname(window.localStorage.getItem('myNickname'));
+    this.updateNickname(window.localStorage.getItem('myNickname' + this.socket.id));
     this.socket.emit(EVENTS.SHARE_USER_INFO, { roomId: this.roomId, nickName: this.nickname, isAdmin: this.isNewRoom })
   }
 
@@ -451,6 +455,26 @@ export default class RoomPage extends Vue {
       })
     })
   }
+
+  drawMessageInChat(data) {
+    console.log('а я взагаліто нова смсочка в чат від', data.from, ' => ' , data.text);
+  }
+
+  sendMessageToChat(text) {
+    const hardCode = 'kek' // rm ME
+
+    const evt = {
+      type: msgTypes.CHAT,
+      data: {
+        from: window.localStorage.getItem('myNickname' + this.socket.id),
+        text: hardCode  // rm ME
+      }
+    }
+    this.drawMessageInChat(evt.data)
+
+    this.dcs.forEach(dc => dc.send(JSON.stringify(evt)))
+  }
+
 }
 </script>
 
