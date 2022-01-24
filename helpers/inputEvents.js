@@ -16,7 +16,9 @@ export const inputEvents = {
     }
 
     const dataChannel = await this.peers[peerId].createDataChannel('peer_data_channel');
-    this.dcs = new Map(this.dcs.set(peerId, dataChannel)); //vue 2 kostyl XD
+    this.dcs.set(peerId, dataChannel)
+    this.dcs = new Map([...this.dcs]); //vue 2 kostyl XD
+
     dataChannel.onopen = () => {
       const msg = {
         type: msgTypes.DEVICE_STATUS,
@@ -92,8 +94,13 @@ export const inputEvents = {
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
-    this.dcs.get(peerId).close()
-    this.dcs = new Map(this.dcs.delete(peerId))
+
+    if (this.dcs.has(peerId)) {
+      this.dcs.get(peerId).close()
+      this.dcs.delete(peerId)
+      this.dcs = new Map([...this.dcs]) //vue 2 kostyl XD
+    }
+
     delete this.peers[peerId];
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
@@ -103,7 +110,7 @@ export const inputEvents = {
     if (msg === '404') this.$router.push({ path: '/error' })
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
-    console.log('ACCEPT_USER_INFO', { clientId, nickName, isAdmin });
+    console.log('ACCEPT_USER_INFO me:', this.socket.id, { clientId, nickName, isAdmin });
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
     else if (isAdmin) this.admin = true;
   }

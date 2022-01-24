@@ -152,6 +152,7 @@ import EVENTS from '../../helpers/events'
 import socketIo from '../../helpers/socketIo.js'
 import dataSources from '../../helpers/dataSources'
 import events from '../../helpers/events'
+import msgTypes from '../../helpers/dataChannels/msgTypes'
 
 const { State, Mutation } = namespace('room')
 const { State: AddRoomState } = namespace('addRoomClick')
@@ -329,14 +330,14 @@ export default class RoomPage extends Vue {
     if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
     else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
     const msg = {
-      peerId: this.socket.id,
-      cameraOn: this.stream.getVideoTracks()[0]?.enabled,
-      micOn: this.stream.getAudioTracks()[0]?.enabled 
+      type: msgTypes.DEVICE_STATUS,
+      data: {
+        peerId: this.socket.id,
+        cameraOn: this.stream.getVideoTracks()[0]?.enabled,
+        micOn: this.stream.getAudioTracks()[0]?.enabled 
+      }
     }
-    this.dcs.forEach(dc => { 
-      console.log(dc);
-      dc.send(JSON.stringify(msg))
-    });
+    this.dcs.forEach(dc => dc.send(JSON.stringify(msg)));
   }
 
   async switchDataSource() {
@@ -360,7 +361,7 @@ export default class RoomPage extends Vue {
   }
 
   removePersonFromRoom(kikId) {
-    this.kikDcs[kikId].send(JSON.stringify({ status: 'go away' }))
+    this.dcs.get(kikId).send(JSON.stringify({ type: msgTypes.KICK, data: {} }))
   }
 
   async leaveRoom() {
