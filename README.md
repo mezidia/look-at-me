@@ -13,6 +13,7 @@ As a member you are able to:
 - turn on/off these options by clicking a corresponding buttons.
 - change your nickname (the seetings at the up-right corner)
 - scale up member's video/screen view by double-clicking at it
+- write message into the chat so other members can see it and give their response
 - mute people (the audio/video will be turned off only for you)
 - leave room at any moment (red button).
 
