@@ -140,10 +140,10 @@
           right
           width="300" 
           app id="chat">
-            <div style="height: auto; overflow: scroll">
+            <div class="mb-15" style="overflow: scroll; width: 100%">
               <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
             </div>
-            <div style="height: 100px">
+            <div class="message-input" style="height: 60px">
               <v-text-field
               class="ma-3"
               v-model="text"
@@ -545,7 +545,7 @@ div#room-holder {
 
 .message-input {
   position: absolute;
-  bottom: 0;
+  bottom: 40px;
 }
 
 .hover-pointer:hover {
