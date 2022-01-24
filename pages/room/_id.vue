@@ -212,12 +212,11 @@ export default class RoomPage extends Vue {
   clients = [];
   rooms = [];
   peerId = '1';
-  dcs = [];
-  kikDcs = {};
+  dcs = new Map();
   dataSource = 'webCamera';
 
   get mediaAvailable () {
-    return this.dcs.length > 0;
+    return this.dcs.size > 0;
   }
 
   beforeCreate() {
@@ -248,7 +247,7 @@ export default class RoomPage extends Vue {
   }
 
   async cameraClick() {
-    if (this.dcs.length === 0) return;
+    if (this.dcs.size === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
       const ans = await this.switchDataSource();
@@ -264,13 +263,13 @@ export default class RoomPage extends Vue {
   }
 
   micClick() {
-    if (this.dcs.length === 0) return;
+    if (this.dcs.size === 0) return;
     this.micOn = !this.micOn;
     this.captureMedia();
   }
 
   async screenSharingClick() {
-    if (this.dcs.length === 0) return;
+    if (this.dcs.size === 0) return;
     if(this.dataSource !== 'screenCast') {
       const ans = await this.switchDataSource();
       if (!ans) return;
@@ -326,7 +325,12 @@ export default class RoomPage extends Vue {
 
     if (this.micOn) this.stream.getAudioTracks()[0].enabled = true;
     else if (this.stream.getAudioTracks()[0]) this.stream.getAudioTracks()[0].enabled = false;
-    this.dcs.forEach(dc => dc.send(JSON.stringify({ cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled })));
+    const msg = {
+      peerId: this.socket.id,
+      cameraOn: this.stream.getVideoTracks()[0]?.enabled,
+      micOn: this.stream.getAudioTracks()[0]?.enabled 
+    }
+    this.dcs.forEach(dc => dc.send(JSON.stringify(msg)));
   }
 
   async switchDataSource() {

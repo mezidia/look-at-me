@@ -1,37 +1,33 @@
 import freeice from 'freeice'
 import EVENTS from './events'
+import handleDataChannel from './dataChannels'
+import msgTypes from './dataChannels/msgTypes'
 
 export const inputEvents = {
   [EVENTS.ADD_PEER]: async function ({ peerId, createOffer }) {
     if (this.peers.hasOwnProperty(peerId)) {
-      console.log('peer already exist'); 
+      console.warn('peer already exist'); 
       return;
-    }
-
-    const channelHandlers = {
-      devicesStatus: (e) => {
-        const data = JSON.parse(e.data);
-        this.updateDevicesStatus({ peerId, devices: data });
-      },
-      kik: async (e) => {
-        await this.leaveRoom();
-      },
     }
 
     this.peers[peerId] = new RTCPeerConnection({ iceServers: freeice() })
     this.peers[peerId].ondatachannel = e => {
-      e.channel.onmessage = channelHandlers[e.channel.label]
+      e.channel.onmessage = e => handleDataChannel.call(this, e)
     }
 
-    const devicesStatusDc = await this.peers[peerId].createDataChannel('devicesStatus');
-    const kikDc = await this.peers[peerId].createDataChannel('kik');
-    this.dcs.push(devicesStatusDc);
-    this.kikDcs[peerId] = kikDc;
-    devicesStatusDc.onopen = () => {
-      devicesStatusDc.send(JSON.stringify({peerId, cameraOn: this.stream.getVideoTracks()[0].enabled, micOn: this.stream.getAudioTracks()[0]?.enabled }));
+    const dataChannel = await this.peers[peerId].createDataChannel('peer_data_channel');
+    this.dcs.set(peerId, dataChannel)
+    dataChannel.onopen = () => {
+      const msg = {
+        type: msgTypes.DEVICE_STATUS,
+        data: {
+          peerId: this.socket.id,
+          cameraOn: this.stream.getVideoTracks()[0]?.enabled,
+          micOn: this.stream.getAudioTracks()[0]?.enabled
+        }
+      }
+      dataChannel.send(JSON.stringify(msg));
     }
-
-
 
     this.peers[peerId].onicecandidate = (event) => {
       if (event.candidate) {
@@ -96,13 +92,15 @@ export const inputEvents = {
     if (this.peers[peerId]) {
       this.peers[peerId].close();
     }
+    this.dcs.get(peerId).close()
+    this.dcs.delete(peerId)
     delete this.peers[peerId];
   },
   [EVENTS.SHARE_ROOMS_INFO]: async function ({ rooms }) {
     this.socket.rooms = rooms
   },
   [EVENTS.ERROR]: async function ({ msg }) {
-    if (msg === '404') this.$router.push({path: '/error'})
+    if (msg === '404') this.$router.push({ path: '/error' })
   },
   [EVENTS.ACCEPT_USER_INFO]: async function ({ clientId, nickName, isAdmin }) {
     if (this.socket.id !== clientId) this.updateNameStatus({ clientId, nickName, isAdmin });
