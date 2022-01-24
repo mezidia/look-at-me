@@ -140,11 +140,12 @@
           right
           width="300" 
           app id="chat">
-            <div class="mb-15" style="overflow: scroll; width: 100%">
+            <div style="overflow: scroll; width: 100%; margin-bottom: 100px">
               <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
             </div>
-            <div class="message-input" style="height: 60px">
+            <div class="message-input" style="height: 100px; background-color: #363636">
               <v-text-field
+              style="margin-bottom: 40px"
               class="ma-3"
               v-model="text"
               outlined
@@ -489,6 +490,7 @@ export default class RoomPage extends Vue {
   }
 
   sendMessageToChat() {
+    if (this.text.length === 0) return;
     const text = this.text;
     this.text = '';
 
@@ -548,7 +550,7 @@ div#room-holder {
 
 .message-input {
   position: absolute;
-  bottom: 40px;
+  bottom: 0px;
 }
 
 .hover-pointer:hover {
