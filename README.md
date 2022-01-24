@@ -27,7 +27,7 @@ Enjoy look-at-me platfrom!
 ![hey](https://github.com/mezidia/look-at-me/blob/55de179961d018dd9c13dcb0852a811a8117c560/team.jpg)
 
 ## Team members
-[la7rodectus](https://github.com/La7rodectus).
-[lizardynx](https://github.com/lizardlynx).
-[tr1ckste](https://github.com/tr1ckste).
-[zavad4](https://github.com/zavad4).
+* [la7rodectus](https://github.com/La7rodectus).
+* [lizardynx](https://github.com/lizardlynx).
+* [tr1ckste](https://github.com/tr1ckste).
+* [zavad4](https://github.com/zavad4).
