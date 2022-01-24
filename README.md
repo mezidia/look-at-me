@@ -23,6 +23,9 @@ The platfrom supports transfer of rights, so if owner leave the room, another us
 ## Deployment
 The platform is accessable [by this link](https://look--at--me.herokuapp.com/) 
 
+Enjoy look-at-me platfrom!
+![hey](https://github.com/mezidia/look-at-me/blob/55de179961d018dd9c13dcb0852a811a8117c560/team.jpg)
+
 ## Team members
 [la7rodectus](https://github.com/La7rodectus).
 [lizardynx](https://github.com/lizardlynx).
