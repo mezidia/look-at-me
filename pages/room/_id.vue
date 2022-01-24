@@ -112,7 +112,6 @@
         <v-spacer></v-spacer>
         <p v-show="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
-        <BasicButton class="mx-3" text="Push me plz" :onClick="sendMessageToChat" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -138,7 +137,21 @@
           right
           width="300" 
           app id="chat">
-            <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
+            <div style="height: auto; overflow: scroll">
+              <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
+            </div>
+            <div style="height: 100px">
+              <v-text-field
+              class="ma-3"
+              v-model="text"
+              outlined
+              append-icon="mdi-send"
+              @click:append="sendMessageToChat"
+              clearable
+              label="Message"
+              type="text"
+            />
+            </div>
          </v-navigation-drawer>
     </div>
 
@@ -236,6 +249,7 @@ export default class RoomPage extends Vue {
 
   drawer = false;
   messages = [];
+  text = '';
 
   get mediaAvailable() {
     return this.dcs.size > 0;
@@ -439,8 +453,8 @@ export default class RoomPage extends Vue {
     stream.getAudioTracks()[0].enabled = true;
   }
 
-  sendMessage(name, msg) {
-    this.messages.push({name, msg})
+  drawMessageInChat({ from, text }) {
+    this.messages.push({ name: from, msg: text })
   }
 
   awaitResponse(type, n) {
@@ -456,18 +470,15 @@ export default class RoomPage extends Vue {
     })
   }
 
-  drawMessageInChat(data) {
-    console.log('а я взагаліто нова смсочка в чат від', data.from, ' => ' , data.text);
-  }
-
-  sendMessageToChat(text) {
-    const hardCode = 'kek' // rm ME
+  sendMessageToChat() {
+    const text = this.text;
+    this.text = '';
 
     const evt = {
       type: msgTypes.CHAT,
       data: {
         from: window.localStorage.getItem('myNickname' + this.socket.id),
-        text: hardCode  // rm ME
+        text
       }
     }
     this.drawMessageInChat(evt.data)
@@ -517,6 +528,10 @@ div#room-holder {
   align-items: flex-end;
 }
 
+.message-input {
+  position: absolute;
+  bottom: 0;
+}
 
 .hover-pointer:hover {
   cursor: pointer;

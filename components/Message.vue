@@ -1,5 +1,5 @@
 <template>
-  <v-card class="ma-4" max-width="344">
+  <v-card class="ma-3" max-width="344">
     <v-card-text>
       <div class="message-name">{{ name }}</div>
       <div class="text--primary">
