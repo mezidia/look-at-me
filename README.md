@@ -19,7 +19,7 @@ As a member you are able to:
 
 As the owner of room your additional ability is removing other users.
 
-The platfrom supports transfer of rights, so if owner leave the room, another user become owner and will be able to remove members from room.
+The platfrom supports transfer of rights, so if owner leave the room, another user becomes an owner and will be able to remove members from current room.
 
 ## Deployment
 The platform is accessable [by this link](https://look--at--me.herokuapp.com/) 
