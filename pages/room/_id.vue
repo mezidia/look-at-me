@@ -15,7 +15,7 @@
         <v-row v-show="focusedId" id="selectedPanel" class="fill-height" justify="center">
           <div
             class="hover-pointer"
-            @dblclick="unselectUser()"
+            @dblclick="unselectUser(focusedId)"
           >
             <UserBlock
               :id="'focusedId'"
@@ -26,6 +26,9 @@
               :micClicked="focusedUser ? focusedUser.micOn : micOn"
               :width="720"
               :height="405"
+              :userMutedStatus="focusedMuted"
+              @userMuted="muteUser(focusedId)"
+              @userUnmuted="unmuteUser(focusedId)"
             />
           </div>
         </v-row>
@@ -112,7 +115,6 @@
         <v-spacer></v-spacer>
         <p v-show="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
-        <BasicButton class="mx-3" text="Push me plz" :onClick="sendMessageToChat" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -130,6 +132,32 @@
         class="settings-button"
       />
     </div>
+    <div class="chat-wrapper">
+      <v-icon id="chat-button" @click="drawer = !drawer">mdi-message</v-icon>
+         <v-navigation-drawer 
+          v-model="drawer" 
+          floating 
+          right
+          width="300" 
+          app id="chat">
+            <div style="height: auto; overflow: scroll">
+              <Message v-for="(msg, index) in messages" :key="index" :name="msg.name" :msg="msg.msg"/>
+            </div>
+            <div style="height: 100px">
+              <v-text-field
+              class="ma-3"
+              v-model="text"
+              outlined
+              append-icon="mdi-send"
+              @click:append="sendMessageToChat"
+              clearable
+              label="Message"
+              type="text"
+            />
+            </div>
+         </v-navigation-drawer>
+    </div>
+
     <NotificationSnackbar
       :text="snackbarText"
       :snackbar="snackbar"
@@ -147,6 +175,7 @@ import BasicButton from '../../components/BasicButton.vue'
 import VuetifyIcon from '../../components/VuetifyIcon.vue'
 import SettingsModal from '../../components/SettingsModal.vue'
 import NotificationSnackbar from '../../components/NotificationSnackbar.vue'
+import Message from '../../components/Message.vue'
 
 import { inputEvents } from '../../helpers/inputEvents'
 import EVENTS from '../../helpers/events'
@@ -168,7 +197,8 @@ const { Mutation: UserMutation, State: UserState } = namespace('user')
     BasicButton,
     VuetifyIcon,
     SettingsModal,
-    NotificationSnackbar
+    NotificationSnackbar,
+    Message
   }
 })
 
@@ -210,6 +240,9 @@ export default class RoomPage extends Vue {
   focusedName = '';
   focusedId = null;
   focusedUser = null;
+  focusedMuted = 'hi';
+
+  mutedInSelectedStatus = 'Mute';
   
   isNewRoom = false;
   socket = null;
@@ -219,6 +252,10 @@ export default class RoomPage extends Vue {
   peerId = '1';
   dcs = new Map();
   dataSource = 'webCamera';
+
+  drawer = false;
+  messages = [];
+  text = '';
 
   get mediaAvailable() {
     return this.dcs.size > 0;
@@ -255,7 +292,6 @@ export default class RoomPage extends Vue {
   }
 
   async cameraClick() {
-    console.log('cameraClick', this.dcs, this.dcs.size);
     if (this.dcs.size === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
@@ -390,9 +426,16 @@ export default class RoomPage extends Vue {
   }
 
   selectUser(peerId, userName, user) {
-    this.unselectUser();
+    if (this.selectedId) {
+      this.unselectUser();
+    }
     this.focusedId = peerId;
     this.focusedName = userName;
+
+    const mutedStatus = document.getElementById('muted' + peerId).innerText.trim();
+    console.log('THIS MUTED STATUS', mutedStatus)
+
+    this.focusedMuted = mutedStatus;
     
     const selectedSlot = document.getElementById('videofocusedId');
     const selectedId = 'video' + peerId;
@@ -409,14 +452,15 @@ export default class RoomPage extends Vue {
     this.focusedId = null;
     this.focusedName = '';
     this.focusedUser = null;
+    this.focusedMuted = '';
   }
 
   muteUser(peerId) {
     const videoId = 'video' + peerId;
     const video = document.getElementById(videoId);
     const stream = video.srcObject;
-    console.log(stream.getAudioTracks());
     stream.getAudioTracks()[0].enabled = false;
+    this.mutedInSelectedStatus = 'Unmute';
   }
 
   unmuteUser(peerId) {
@@ -424,6 +468,11 @@ export default class RoomPage extends Vue {
     const video = document.getElementById(videoId);
     const stream = video.srcObject;
     stream.getAudioTracks()[0].enabled = true;
+    this.mutedInSelectedStatus = 'Mute';
+  }
+
+  drawMessageInChat({ from, text }) {
+    this.messages.push({ name: from, msg: text })
   }
 
   awaitResponse(type, n) {
@@ -439,18 +488,15 @@ export default class RoomPage extends Vue {
     })
   }
 
-  drawMessageInChat(data) {
-    console.log('а я взагаліто нова смсочка в чат від', data.from, ' => ' , data.text);
-  }
-
-  sendMessageToChat(text) {
-    const hardCode = 'kek' // rm ME
+  sendMessageToChat() {
+    const text = this.text;
+    this.text = '';
 
     const evt = {
       type: msgTypes.CHAT,
       data: {
         from: window.localStorage.getItem('myNickname' + this.socket.id),
-        text: hardCode  // rm ME
+        text
       }
     }
     this.drawMessageInChat(evt.data)
@@ -489,7 +535,20 @@ div#room-holder {
 .settings-button {
   position: absolute;
   top: 20px;
+  left: 20px;
+}
+
+.chat-wrapper {
+  position: absolute;
+  top: 20px;
   right: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.message-input {
+  position: absolute;
+  bottom: 0;
 }
 
 .hover-pointer:hover {
