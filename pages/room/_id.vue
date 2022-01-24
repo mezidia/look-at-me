@@ -112,6 +112,7 @@
         <v-spacer></v-spacer>
         <p v-show="!mediaAvailable">Wait for the pelmens to stream 	🥟&#127909;</p>
         <BasicButton class="mx-3" text="Leave Room" :onClick="leaveRoom" color="error"/>
+        <BasicButton class="mx-3" text="Push me plz" :onClick="sendMessageToChat" color="error"/>
       </v-row>
     </div>
     <SettingsModal
@@ -432,6 +433,23 @@ export default class RoomPage extends Vue {
       })
     })
   }
+
+  drawMessageInChat(text) {
+    console.log('а я взагаліто нова смсочка в чат =) =>', text);
+  }
+
+  sendMessageToChat(text) {
+    this.drawMessageInChat('kek')
+    const hardCode = 'kek'
+    const evt = {
+      type: msgTypes.CHAT,
+      data: {
+        text: hardCode
+      }
+    }
+    this.dcs.forEach(dc => dc.send(JSON.stringify(evt)))
+  }
+
 }
 </script>
 
