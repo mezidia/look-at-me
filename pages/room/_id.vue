@@ -67,6 +67,8 @@
               :micClicked="user.micOn"
               :width="width"
               :height="height"
+              @userMuted="muteUser(user.peerId)"
+              @userUnmuted="unmuteUser(user.peerId)"
             />
           </div>
         </v-row>
@@ -215,7 +217,7 @@ export default class RoomPage extends Vue {
   dcs = new Map();
   dataSource = 'webCamera';
 
-  get mediaAvailable () {
+  get mediaAvailable() {
     return this.dcs.size > 0;
   }
 
@@ -247,6 +249,7 @@ export default class RoomPage extends Vue {
   }
 
   async cameraClick() {
+    console.log('cameraClick', this.dcs, this.dcs.size);
     if (this.dcs.size === 0) return;
     if(this.dataSource === 'screenCast') {
       this.stream.getVideoTracks()[0].stop();
@@ -330,7 +333,10 @@ export default class RoomPage extends Vue {
       cameraOn: this.stream.getVideoTracks()[0]?.enabled,
       micOn: this.stream.getAudioTracks()[0]?.enabled 
     }
-    this.dcs.forEach(dc => dc.send(JSON.stringify(msg)));
+    this.dcs.forEach(dc => { 
+      console.log(dc);
+      dc.send(JSON.stringify(msg))
+    });
   }
 
   async switchDataSource() {
@@ -396,6 +402,21 @@ export default class RoomPage extends Vue {
     this.focusedId = null;
     this.focusedName = '';
     this.focusedUser = null;
+  }
+
+  muteUser(peerId) {
+    const videoId = 'video' + peerId;
+    const video = document.getElementById(videoId);
+    const stream = video.srcObject;
+    console.log(stream.getAudioTracks());
+    stream.getAudioTracks()[0].enabled = false;
+  }
+
+  unmuteUser(peerId) {
+    const videoId = 'video' + peerId;
+    const video = document.getElementById(videoId);
+    const stream = video.srcObject;
+    stream.getAudioTracks()[0].enabled = true;
   }
 
   awaitResponse(type, n) {

@@ -1,5 +1,6 @@
 <template>
   <v-card 
+  style="{ position: relative }"
   elevation=2 
   class="user-block-holder ma-5"
   :height="height + 'px'"
@@ -11,6 +12,14 @@
       <OnOffIcon iconName="mdi-microphone" :pointer="false" :clicked="micClicked"/>
       <OnOffIcon v-show="admin" class="ml-3" iconName="mdi-exit-to-app" :onClick="removePersonFromRoom"/>
     </v-row>
+    <div
+      v-show="id !== '1'"
+      class="mute-button"
+      @click.stop="changeMutedStatus"
+      v-bind:class="{'font-yellow': mutedStatus === 'Mute', 'font-green': mutedStatus === 'Unmute'}"
+    >
+        {{ mutedStatus }}
+    </div>
   </v-card>
 </template>
 
@@ -36,9 +45,30 @@ export default class UserBlock extends Vue {
   @Prop({type: Boolean, required: false, default: false}) pageLoading;
   @Prop({type: Boolean, required: false, default: false}) admin;
 
+  mutedStatus = 'Mute';
+
   @Emit('removePersonFromRoom')
   removePersonFromRoom() {
     return this.id;
+  }
+
+
+  changeMutedStatus() {
+    if (this.mutedStatus === 'Mute') {
+      this.muteUser()
+      return;
+    }
+    this.unmuteUser();
+  }
+
+  @Emit('userMuted')
+  muteUser() {
+    this.mutedStatus = 'Unmute';
+  }
+
+  @Emit('userUnmuted')
+  unmuteUser() {
+    this.mutedStatus = 'Mute';
   }
 }
 </script>
@@ -67,6 +97,25 @@ p {
   position: absolute;
   bottom: 20px;
   left: 20px;
+}
+
+.font-green {
+  color: #40826d;
+}
+
+.font-yellow {
+  color: #b5a642;
+}
+
+.mute-button {
+  width: 70px;
+  text-align: center;
+  background: #121212;
+  border-radius: 5px;
+  padding: 5px;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
 }
 
 </style>
