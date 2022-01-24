@@ -16,7 +16,7 @@ export const inputEvents = {
     }
 
     const dataChannel = await this.peers[peerId].createDataChannel('peer_data_channel');
-    this.dcs = new Map(this.dcs.set('kek', 'lol')); //vue 2 kostyl XD
+    this.dcs = new Map(this.dcs.set(peerId, dataChannel)); //vue 2 kostyl XD
     dataChannel.onopen = () => {
       const msg = {
         type: msgTypes.DEVICE_STATUS,

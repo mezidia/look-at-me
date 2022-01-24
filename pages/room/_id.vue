@@ -333,7 +333,10 @@ export default class RoomPage extends Vue {
       cameraOn: this.stream.getVideoTracks()[0]?.enabled,
       micOn: this.stream.getAudioTracks()[0]?.enabled 
     }
-    this.dcs.forEach(dc => dc.send(JSON.stringify(msg)));
+    this.dcs.forEach(dc => { 
+      console.log(dc);
+      dc.send(JSON.stringify(msg))
+    });
   }
 
   async switchDataSource() {
