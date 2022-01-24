@@ -67,6 +67,8 @@
               :micClicked="user.micOn"
               :width="width"
               :height="height"
+              @userMuted="muteUser(user.peerId)"
+              @userUnmuted="unmuteUser(user.peerId)"
             />
           </div>
         </v-row>
@@ -397,6 +399,21 @@ export default class RoomPage extends Vue {
     this.focusedId = null;
     this.focusedName = '';
     this.focusedUser = null;
+  }
+
+  muteUser(peerId) {
+    const videoId = 'video' + peerId;
+    const video = document.getElementById(videoId);
+    const stream = video.srcObject;
+    console.log(stream.getAudioTracks());
+    stream.getAudioTracks()[0].enabled = false;
+  }
+
+  unmuteUser(peerId) {
+    const videoId = 'video' + peerId;
+    const video = document.getElementById(videoId);
+    const stream = video.srcObject;
+    stream.getAudioTracks()[0].enabled = true;
   }
 
   awaitResponse(type, n) {
